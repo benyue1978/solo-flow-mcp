@@ -1,14 +1,15 @@
 # Solo Flow MCP Server
 
-一个支持SSE（Server-Sent Events）的Model Context Protocol (MCP) 服务器，包含一个简单的hello world工具。
+一个支持Streamable HTTP（现代MCP标准）的Model Context Protocol (MCP) 服务器，包含一个简单的hello world工具。
 
 ## 功能特性
 
-- 支持SSE传输协议
+- 支持Streamable HTTP传输协议（现代MCP标准）
 - 包含hello world工具，支持多语言问候
 - 提供简单的文本资源
 - 健康检查端点
 - CORS支持
+- 会话管理
 
 ## 安装
 
@@ -35,8 +36,7 @@ npm start
 
 ## 端点
 
-- **SSE端点**: `GET /sse` - MCP通信的主要端点
-- **消息端点**: `POST /messages` - 处理MCP消息
+- **Streamable HTTP端点**: `ALL /mcp` - MCP通信的主要端点
 - **健康检查**: `GET /health` - 服务器状态检查
 
 ## 可用工具
@@ -46,10 +46,12 @@ npm start
 一个简单的问候工具，支持多语言。
 
 **参数**:
+
 - `name` (可选): 要问候的名字，默认为 "World"
 - `language` (可选): 问候语言，支持 "en", "zh", "es", "fr"，默认为 "en"
 
 **示例**:
+
 ```json
 {
   "name": "Alice",
@@ -58,7 +60,8 @@ npm start
 ```
 
 **响应**:
-```
+
+```text
 你好，Alice！
 ```
 
@@ -68,22 +71,50 @@ npm start
 
 ## 使用MCP Inspector测试
 
+### 方法一：使用CLI Inspector（推荐）
+
+```bash
+npm run inspector
+```
+
+或者直接运行：
+
+```bash
+npx @modelcontextprotocol/inspector node dist/server.js
+```
+
+这会自动启动服务器并打开Inspector界面。
+
+### 方法二：手动启动 + Web Inspector
+
 1. 启动服务器：
+
    ```bash
    npm run dev
    ```
 
-2. 打开 [MCP Inspector](https://modelcontextprotocol.io/docs/tools/inspector)
+2. 打开 [MCP Inspector Web界面](https://modelcontextprotocol.io/docs/tools/inspector)
 
 3. 在Inspector中配置连接：
-   - **Transport**: SSE
-   - **SSE URL**: `http://localhost:3000/sse`
-   - **Messages URL**: `http://localhost:3000/messages`
+   - **Transport**: Streamable HTTP
+   - **URL**: `http://localhost:3000/mcp`
 
 4. 连接后，你可以：
    - 查看可用的工具和资源
    - 测试 `hello_world` 工具
    - 读取 `file:///hello.txt` 资源
+
+### 查看演示
+
+```bash
+npm run demo
+```
+
+### 测试Streamable HTTP连接
+
+```bash
+npm run test-sse
+```
 
 ## 开发
 
@@ -96,4 +127,4 @@ npm run dev
 
 ## 许可证
 
-MIT 
+MIT

@@ -8,6 +8,9 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "dev": "tsc && node dist/server.js",
+    "demo": "node demo.js",
+    "test-sse": "node test-sse.js",
+    "inspector": "npx @modelcontextprotocol/inspector node dist/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [

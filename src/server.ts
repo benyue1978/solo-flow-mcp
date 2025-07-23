@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { SSEServerTransport } from '@modelcontextprotocol/sdk/server/sse.js';
+import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import { z } from 'zod';
 
 // Create MCP server
@@ -61,61 +61,35 @@ server.resource(
 // Create Express app
 const app = express();
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '4mb' }));
 
-// Store active SSE transports
-const transports: Record<string, SSEServerTransport> = {};
-
-// SSE endpoint for MCP communication
-app.get('/sse', async (req, res) => {
-  console.log('New SSE connection established');
-  
-  // Set SSE headers
-  res.writeHead(200, {
-    'Content-Type': 'text/event-stream',
-    'Cache-Control': 'no-cache',
-    'Connection': 'keep-alive',
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Cache-Control'
-  });
-
-  // Create SSE transport
-  const transport = new SSEServerTransport('/messages', res);
-  transports[transport.sessionId] = transport;
-  
-  console.log(`SSE transport created with session ID: ${transport.sessionId}`);
-  
-  // Handle client disconnect
-  res.on('close', () => {
-    console.log(`SSE connection closed for session: ${transport.sessionId}`);
-    delete transports[transport.sessionId];
-  });
-  
-  // Connect transport to MCP server
-  try {
-    await server.connect(transport);
-    console.log(`MCP server connected to transport: ${transport.sessionId}`);
-  } catch (error) {
-    console.error('Error connecting transport to MCP server:', error);
-    res.end();
+// Create Streamable HTTP transport with session management
+const transport = new StreamableHTTPServerTransport({
+  sessionIdGenerator: () => crypto.randomUUID(),
+  onsessioninitialized: (sessionId) => {
+    console.log(`Session initialized: ${sessionId}`);
+  },
+  onsessionclosed: (sessionId) => {
+    console.log(`Session closed: ${sessionId}`);
   }
 });
 
-// Message endpoint for SSE transport
-app.post('/messages', async (req, res) => {
-  const sessionId = req.query.sessionId as string;
-  const transport = transports[sessionId];
-  
-  if (!transport) {
-    console.error(`No transport found for sessionId: ${sessionId}`);
-    return res.status(400).json({ error: 'No transport found for sessionId' });
-  }
+// Connect transport to MCP server first
+await server.connect(transport);
+console.log('MCP server connected to Streamable HTTP transport');
+
+// Streamable HTTP endpoint for MCP communication
+app.all('/mcp', async (req, res) => {
+  console.log('New Streamable HTTP connection request');
   
   try {
-    await transport.handlePostMessage(req, res, req.body);
+    // Pass the parsed body to the transport
+    await transport.handleRequest(req, res, req.body);
   } catch (error) {
-    console.error('Error handling message:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error('Error in /mcp route:', error);
+    if (!res.headersSent) {
+      res.status(500).json({ error: 'Internal server error' });
+    }
   }
 });
 
@@ -125,7 +99,7 @@ app.get('/health', (req, res) => {
     status: 'ok', 
     server: 'solo-flow-mcp-server',
     version: '1.0.0',
-    activeConnections: Object.keys(transports).length
+    transport: 'Streamable HTTP'
   });
 });
 
@@ -133,8 +107,7 @@ app.get('/health', (req, res) => {
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`MCP Server running on port ${PORT}`);
-  console.log(`SSE endpoint: http://localhost:${PORT}/sse`);
-  console.log(`Messages endpoint: http://localhost:${PORT}/messages`);
+  console.log(`Streamable HTTP endpoint: http://localhost:${PORT}/mcp`);
   console.log(`Health check: http://localhost:${PORT}/health`);
   console.log('Available tools: hello_world');
   console.log('Available resources: file:///hello.txt');
