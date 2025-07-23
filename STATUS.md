@@ -6,6 +6,8 @@
 
 - [x] MCP Server 基础框架
 - [x] Streamable HTTP 传输协议支持（现代标准）
+- [x] Stdio 传输协议支持（CLI工具集成）
+- [x] 双传输协议模式切换（stdio默认）
 - [x] hello_world 工具（多语言支持）
 - [x] 文件资源支持
 - [x] 健康检查端点
@@ -15,7 +17,8 @@
 ### 测试验证
 
 - [x] 健康检查端点测试
-- [x] SSE 连接测试
+- [x] Streamable HTTP 连接测试
+- [x] Stdio 连接测试
 - [x] MCP Inspector 兼容性
 - [x] 错误处理
 
@@ -24,7 +27,8 @@
 - [x] README.md - 项目说明
 - [x] MCP_INSPECTOR_TEST.md - 详细测试指南
 - [x] demo.js - 演示脚本
-- [x] test-sse.js - SSE连接测试
+- [x] test-http.js - Streamable HTTP连接测试
+- [x] test-stdio.js - Stdio连接测试
 
 ## 🚀 使用方法
 
@@ -37,8 +41,33 @@ npm install
 # 构建项目
 npm run build
 
-# 启动服务器
+# 启动服务器（stdio模式，默认）
 npm start
+```
+
+### 传输协议模式
+
+#### Stdio模式（默认）
+
+```bash
+# 默认模式
+npm start
+
+# 或直接运行
+node dist/server.js
+```
+
+#### HTTP模式
+
+```bash
+# 开发模式
+npm run dev
+
+# 或直接运行HTTP模式
+npm run http
+
+# 或直接运行
+node dist/server.js --http
 ```
 
 ### 测试功能
@@ -47,8 +76,11 @@ npm start
 # 查看演示
 npm run demo
 
-# 测试SSE连接
-npm run test-sse
+# 测试Stdio连接（默认）
+npm run test-stdio
+
+# 测试Streamable HTTP连接
+npm run test-http
 
 # 使用MCP Inspector
 npm run inspector
@@ -64,10 +96,18 @@ curl http://localhost:3000/health
 
 **结果**: ✅ 正常返回服务器状态
 
+### Stdio连接（默认）
+
+```bash
+npm run test-stdio
+```
+
+**结果**: ✅ Stdio连接建立成功，所有MCP协议消息正常处理
+
 ### Streamable HTTP连接
 
 ```bash
-npm run test-sse
+npm run test-http
 ```
 
 **结果**: ✅ Streamable HTTP连接建立成功，返回正确JSON-RPC响应
@@ -97,6 +137,11 @@ npx @modelcontextprotocol/inspector node dist/server.js
 - **GET /health**: 健康检查
 - **ALL /mcp**: Streamable HTTP连接端点
 
+### 传输协议
+
+- **Stdio（默认）**: CLI工具、直接集成、自动化脚本
+- **Streamable HTTP**: Web工具、MCP Inspector、浏览器集成
+
 ## 🔧 技术栈
 
 - **Runtime**: Node.js
@@ -104,7 +149,7 @@ npx @modelcontextprotocol/inspector node dist/server.js
 - **Framework**: Express.js
 - **MCP SDK**: @modelcontextprotocol/sdk v1.16.0
 - **Validation**: Zod
-- **Transport**: Streamable HTTP (现代MCP标准)
+- **Transport**: Stdio（默认）+ Streamable HTTP
 
 ## 📚 参考文档
 
@@ -134,6 +179,20 @@ npx @modelcontextprotocol/inspector node dist/server.js
 - 无
 
 ## 📝 更新日志
+
+### v1.2.0 (2025-01-XX)
+
+- 将stdio设为默认模式
+- HTTP模式需要--http参数
+- 优化模式切换逻辑
+- 更新文档和脚本
+
+### v1.1.0 (2025-01-XX)
+
+- 添加Stdio传输协议支持
+- 实现双传输协议模式切换
+- 添加stdio模式测试脚本
+- 更新文档和示例
 
 ### v1.0.0 (2025-07-23)
 

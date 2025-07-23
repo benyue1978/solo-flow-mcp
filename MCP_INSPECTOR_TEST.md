@@ -185,4 +185,5 @@ Session initialized: [session-id]
 4. 代码生成工具
 5. 文档处理工具
 
-参考 [MCP TypeScript SDK 文档](https://github.com/modelcontextprotocol/typescript-sdk) 了解更多功能。
+参考 [MCP TypeScript SDK 文档](https://github.com/modelcontextprotocol/typescript-sdk)
+了解更多功能。

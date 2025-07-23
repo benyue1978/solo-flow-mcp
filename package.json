@@ -1,22 +1,25 @@
 {
   "name": "solo-flow-mcp",
   "version": "1.0.0",
-  "description": "MCP Server with SSE support and hello world tool",
+  "description": "MCP Server with Streamable HTTP and stdio support",
   "main": "dist/server.js",
   "type": "module",
   "scripts": {
     "build": "tsc",
     "start": "node dist/server.js",
-    "dev": "tsc && node dist/server.js",
-    "demo": "node demo.js",
-    "test-sse": "node test-sse.js",
+    "dev": "tsc && node dist/server.js --http",
+    "http": "node dist/server.js --http",
+    "test-sse": "node test-http.js",
+    "test-stdio": "node test-stdio.js",
+    "test-inspector": "node test-inspector.js",
     "inspector": "npx @modelcontextprotocol/inspector node dist/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
     "mcp",
     "model-context-protocol",
-    "sse"
+    "streamable-http",
+    "stdio"
   ],
   "author": "",
   "license": "MIT",

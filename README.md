@@ -1,10 +1,11 @@
 # Solo Flow MCP Server
 
-一个支持Streamable HTTP（现代MCP标准）的Model Context Protocol (MCP) 服务器，包含一个简单的hello world工具。
+一个支持Streamable HTTP和stdio双传输协议的Model Context Protocol (MCP) 服务器，包含一个简单的hello world工具。
 
 ## 功能特性
 
 - 支持Streamable HTTP传输协议（现代MCP标准）
+- 支持stdio传输协议（CLI工具集成）
 - 包含hello world工具，支持多语言问候
 - 提供简单的文本资源
 - 健康检查端点
@@ -23,16 +24,45 @@ npm run build
 
 ## 运行
 
+### Stdio模式（默认）
+
 ```bash
-# 开发模式（构建并运行）
+# 默认模式 - stdio
+npm start
+
+# 或者直接运行
+node dist/server.js
+```
+
+### HTTP模式
+
+```bash
+# 开发模式（HTTP）
 npm run dev
 
-# 或者先构建再运行
-npm run build
-npm start
+# 或者直接运行HTTP模式
+npm run http
+
+# 或者直接运行
+node dist/server.js --http
 ```
 
 服务器将在 `http://localhost:3000` 启动。
+
+## 传输协议
+
+### Stdio（默认）
+
+- **用途**: CLI工具、直接集成、自动化脚本
+- **特点**: 标准输入输出、单会话、轻量级
+- **启动**: 默认模式，无需参数
+
+### Streamable HTTP
+
+- **用途**: Web工具、MCP Inspector、浏览器集成
+- **端点**: `ALL /mcp`
+- **特点**: 支持多会话、CORS、健康检查
+- **启动**: 需要 `--http` 参数
 
 ## 端点
 
@@ -87,10 +117,10 @@ npx @modelcontextprotocol/inspector node dist/server.js
 
 ### 方法二：手动启动 + Web Inspector
 
-1. 启动服务器：
+1. 启动HTTP模式服务器：
 
    ```bash
-   npm run dev
+   npm run http
    ```
 
 2. 打开 [MCP Inspector Web界面](https://modelcontextprotocol.io/docs/tools/inspector)
@@ -104,16 +134,24 @@ npx @modelcontextprotocol/inspector node dist/server.js
    - 测试 `hello_world` 工具
    - 读取 `file:///hello.txt` 资源
 
-### 查看演示
+## 测试
+
+### 测试Stdio连接（默认）
 
 ```bash
-npm run demo
+npm run test-stdio
 ```
 
 ### 测试Streamable HTTP连接
 
 ```bash
-npm run test-sse
+npm run test-http
+```
+
+### 查看演示
+
+```bash
+npm run demo
 ```
 
 ## 开发
@@ -121,7 +159,7 @@ npm run test-sse
 项目使用TypeScript开发，源代码在 `src/` 目录中。
 
 ```bash
-# 开发模式（自动重新构建）
+# 开发模式（HTTP模式，自动重新构建）
 npm run dev
 ```
 

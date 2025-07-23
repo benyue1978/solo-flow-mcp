@@ -1,6 +1,8 @@
 # 🏗️ solo-flow-mcp 系统架构文档
 
-solo-flow-mcp 是为独立开发者和小型团队设计的轻量级 MCP（Model Context Protocol）服务器，基于 Markdown 文件构建项目上下文，以 ChatGPT / Claude + Cursor 等工具为核心协作者，实现 AI 驱动的文档演化与开发流管理。
+solo-flow-mcp 是为独立开发者和小型团队设计的轻量级 MCP（Model Context Protocol）服务器，
+基于 Markdown 文件构建项目上下文，以 ChatGPT / Claude + Cursor 等工具为核心协作者，
+实现 AI 驱动的文档演化与开发流管理。
 
 ---
 
@@ -130,7 +132,9 @@ sequenceDiagram
 
 ## ✅ 八、总结
 
-solo-flow-mcp 是一个专为独立开发者设计的、Markdown 驱动的 AI 协同开发框架，兼容 MCP 标准，支持与 Cursor / Claude 等现代 LLM 工具无缝配合，能让项目文档成为 AI 驱动开发流程的"可持续语境"。
+solo-flow-mcp 是一个专为独立开发者设计的、Markdown 驱动的 AI 协同开发框架，
+兼容 MCP 标准，支持与 Cursor / Claude 等现代 LLM 工具无缝配合，
+能让项目文档成为 AI 驱动开发流程的"可持续语境"。
 
 它强调：
 
