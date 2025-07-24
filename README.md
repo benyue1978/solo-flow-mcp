@@ -8,6 +8,7 @@
 - 支持stdio传输协议（CLI工具集成）
 - 包含hello world工具，支持多语言问候
 - 提供简单的文本资源
+- 动态README.md资源（读取项目根目录）
 - 健康检查端点
 - CORS支持
 - 会话管理
@@ -73,31 +74,106 @@ node dist/server.js --http
 
 ### hello_world
 
-一个简单的问候工具，支持多语言。
-
-**参数**:
-
-- `name` (可选): 要问候的名字，默认为 "World"
-- `language` (可选): 问候语言，支持 "en", "zh", "es", "fr"，默认为 "en"
-
-**示例**:
+一个简单的问候工具，支持多语言：
 
 ```json
 {
-  "name": "Alice",
-  "language": "zh"
+  "name": "hello_world",
+  "description": "A simple hello world tool that returns a greeting message",
+  "inputSchema": {
+    "name": "string (optional, default: 'World')",
+    "language": "en|zh|es|fr (optional, default: 'en')"
+  }
 }
 ```
 
-**响应**:
 
-```text
-你好，Alice！
+
+### get_requirements_md
+
+读取项目需求文档：
+
+```json
+{
+  "name": "get_requirements_md",
+  "description": "Read the requirements document using absolute path",
+  "inputSchema": {
+    "path": "string - Absolute path to requirements document (e.g., '/Users/username/project/docs/requirements.md')"
+  }
+}
+```
+
+### get_tasks_md
+
+读取项目任务文档：
+
+```json
+{
+  "name": "get_tasks_md",
+  "description": "Read the tasks document using absolute path",
+  "inputSchema": {
+    "path": "string - Absolute path to tasks document (e.g., '/Users/username/project/docs/tasks.md')"
+  }
+}
+```
+
+### get_project_info
+
+获取当前工作目录信息：
+
+```json
+{
+  "name": "get_project_info", 
+  "description": "Get information about the current working directory",
+  "inputSchema": {}
+}
+```
+
+### read_readme
+
+读取README.md文件（要求绝对路径）：
+
+```json
+{
+  "name": "read_readme",
+  "description": "Read the README.md file using absolute path",
+  "inputSchema": {
+    "path": "string - Absolute path to README.md file (e.g., '/Users/username/project/README.md')"
+  }
+}
+```
+
+### scan_project
+
+扫描项目目录并列出重要文件和目录结构：
+
+```json
+{
+  "name": "scan_project",
+  "description": "Scan the project directory and list important files and directories",
+  "inputSchema": {
+    "path": "string (optional) - Path to scan (defaults to current project root)",
+    "maxDepth": "number (optional, default: 3) - Maximum directory depth to scan",
+    "includeHidden": "boolean (optional, default: false) - Include hidden files and directories"
+  }
+}
 ```
 
 ## 可用资源
 
 - `file:///hello.txt` - 简单的文本文件
+- `file:///README.md` - 动态README.md文件（读取项目根目录）
+
+### README.md资源
+
+这是一个动态资源，会实时读取当前项目根目录的README.md文件。根据[MCP Roots规范](https://modelcontextprotocol.io/specification/2025-06-18/client/roots)，这个资源展示了如何实现文件系统访问。
+
+**特点**:
+
+- 实时读取项目根目录的README.md
+- 自动处理文件不存在的情况
+- 错误处理和友好的错误消息
+- 支持markdown格式
 
 ## 使用MCP Inspector测试
 
@@ -133,6 +209,7 @@ npx @modelcontextprotocol/inspector node dist/server.js
    - 查看可用的工具和资源
    - 测试 `hello_world` 工具
    - 读取 `file:///hello.txt` 资源
+   - 读取 `file:///README.md` 资源
 
 ## 测试
 
@@ -145,13 +222,19 @@ npm run test-stdio
 ### 测试Streamable HTTP连接
 
 ```bash
-npm run test-http
+npm run test-sse
 ```
 
-### 查看演示
+### 测试README.md资源
 
 ```bash
-npm run demo
+npm run test-readme
+```
+
+### 测试Inspector兼容性
+
+```bash
+npm run test-inspector
 ```
 
 ## 开发

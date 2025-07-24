@@ -12,6 +12,8 @@
     "test-sse": "node test-http.js",
     "test-stdio": "node test-stdio.js",
     "test-inspector": "node test-inspector.js",
+    "test-absolute-paths": "node test-absolute-paths.js",
+    "test-readme": "node test-readme.js",
     "inspector": "npx @modelcontextprotocol/inspector node dist/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
