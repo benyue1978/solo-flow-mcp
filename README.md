@@ -87,8 +87,6 @@ node dist/server.js --http
 }
 ```
 
-
-
 ### get_requirements_md
 
 读取项目需求文档：
