@@ -123,6 +123,13 @@
   });
   ```
 
+- [x] **测试基础设施**
+  - 创建独立的测试目录结构 (`tests/fixtures/test-project/`)
+  - 实现测试工具函数 (`tests/utils/test-helpers.ts`)
+  - 使用真实文件系统测试，替代 mock 测试
+  - 修复 TypeScript 配置，支持 ES2022 模块
+  - 所有 41 个测试用例全部通过
+
 #### 2.3 集成测试实现
 
 - [ ] **MCP 服务器集成测试**
