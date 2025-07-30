@@ -418,6 +418,12 @@ MIT License - see [LICENSE](LICENSE) file for details
 
 ## Changelog
 
+### v1.0.4
+- Update soloflow.mdc content with latest MCP Prompts and Read Before Update rules
+- Sync soloflow-content.ts with latest documentation guidelines
+- Improve ordered list formatting for MD029 compliance
+- Enhance documentation structure and best practices
+
 ### v1.0.2
 - Add comprehensive project documentation (overview, ui_design, deployment, notes)
 - Update README.md with detailed prompts usage guide

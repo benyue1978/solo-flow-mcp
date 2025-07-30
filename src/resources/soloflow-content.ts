@@ -11,9 +11,11 @@ This rule file provides guidelines for using the \`soloflow-mcp\` service to man
 
 - **Document Management**: All project documents are stored in \`.soloflow/\` directory
 - **MCP Operations**: Use \`list\`, \`read\`, \`update\`, and \`init\` operations for document management
+- **MCP Prompts**: Use structured prompts for software engineering best practices
 - **Absolute Paths**: All operations require absolute project root paths for security
 - **Document Types**: Predefined document types ensure consistency
 - **Project Initialization**: Use \`init\` command to set up project configuration automatically
+- **Read Before Update**: Always read existing content before updating documents
 
 ## **Supported Document Types**
 
@@ -85,7 +87,107 @@ Create or update a document:
 }
 \`\`\`
 
+## **Available MCP Prompts**
+
+### **1. Project Initialization Prompt**
+
+Initialize project documentation structure:
+
+\`\`\`json
+{
+  "prompt": "init-project",
+  "args": {
+    "projectName": "My Project"
+  }
+}
+\`\`\`
+
+### **2. Create Document Template Prompt**
+
+Create a standard template for a specific document type:
+
+\`\`\`json
+{
+  "prompt": "create-doc-template",
+  "args": {
+    "docType": "requirements",
+    "projectName": "My Project"
+  }
+}
+\`\`\`
+
+### **3. Add Task Prompt**
+
+Add a new task to the project task list:
+
+\`\`\`json
+{
+  "prompt": "add-task",
+  "args": {
+    "taskTitle": "Implement user authentication",
+    "priority": "high",
+    "category": "backend",
+    "estimatedTime": "2d"
+  }
+}
+\`\`\`
+
+### **4. Check Project Status Prompt**
+
+Analyze project documentation completeness and task progress:
+
+\`\`\`json
+{
+  "prompt": "check-project-status"
+}
+\`\`\`
+
+### **5. Code Review Checklist Prompt**
+
+Get a standard code review checklist:
+
+\`\`\`json
+{
+  "prompt": "code-review-checklist",
+  "args": {
+    "codeLanguage": "TypeScript"
+  }
+}
+\`\`\`
+
+### **6. Deployment Checklist Prompt**
+
+Get a deployment preparation checklist:
+
+\`\`\`json
+{
+  "prompt": "deployment-checklist",
+  "args": {
+    "environment": "production"
+  }
+}
+\`\`\`
+
 ## **Development Workflow & Documentation Maintenance**
+
+### **Critical Rule: Read Before Update**
+
+**ALWAYS read existing document content before updating:**
+
+1. **Read First**: Use \`read\` operation to get current document content
+2. **Analyze Content**: Understand existing structure and content
+3. **Preserve Continuity**: Maintain document consistency and history
+4. **Update Carefully**: Apply changes while preserving existing information
+5. **Verify Completeness**: Ensure all changes are properly documented
+
+### **Document Update Process**
+
+1. **Read Existing Content**: Always use \`read\` operation first
+2. **Analyze Current State**: Understand existing structure and content
+3. **Plan Updates**: Determine what needs to be added or modified
+4. **Preserve History**: Keep existing content and add update history
+5. **Cross-Reference**: Ensure consistency across all related documents
+6. **Verify Changes**: Confirm all updates are complete and accurate
 
 ### **Fallback Document Access**
 
@@ -114,14 +216,16 @@ Create or update a document:
 - **Implementation Discoveries**: Important findings during development that affect design
 - **API Changes**: MCP operations or interfaces are modified
 - **Security Updates**: Security-related changes or vulnerabilities discovered
+- **Prompt Usage**: When using prompts to generate or modify documents
 
 ### **Documentation Update Process**
 
 1. **Identify Affected Documents**: Determine which \`.soloflow/\` documents need updates
-2. **Update Content**: Modify relevant documents with new information
-3. **Cross-Reference**: Ensure consistency across all related documents
-4. **Version Control**: Add update history entries to modified documents
-5. **Verify Completeness**: Ensure all changes are properly documented
+2. **Read Existing Content**: Always read current content before making changes
+3. **Update Content**: Modify relevant documents with new information
+4. **Cross-Reference**: Ensure consistency across all related documents
+5. **Version Control**: Add update history entries to modified documents
+6. **Verify Completeness**: Ensure all changes are properly documented
 
 ## **Usage Scenarios**
 
@@ -165,9 +269,23 @@ When you need to review project requirements:
 }
 \`\`\`
 
-### **Scenario 4: Update Task List**
+### **Scenario 4: Update Task List (with Read First)**
 
 When you need to update project tasks:
+
+1. **First, read existing content:**
+
+\`\`\`json
+{
+  "tool": "read",
+  "args": {
+    "projectRoot": "/Users/username/project",
+    "type": "tasks"
+  }
+}
+\`\`\`
+
+2. **Then, update with new content:**
 
 \`\`\`json
 {
@@ -195,6 +313,75 @@ When you need to document system architecture:
 }
 \`\`\`
 
+### **Scenario 6: Use Prompts for Software Engineering**
+
+When you need structured guidance for software engineering practices:
+
+1. **Initialize project with prompts:**
+
+\`\`\`json
+{
+  "prompt": "init-project",
+  "args": {
+    "projectName": "My Web Application"
+  }
+}
+\`\`\`
+
+2. **Create document templates:**
+
+\`\`\`json
+{
+  "prompt": "create-doc-template",
+  "args": {
+    "docType": "requirements"
+  }
+}
+\`\`\`
+
+3. **Add tasks with prompts:**
+
+\`\`\`json
+{
+  "prompt": "add-task",
+  "args": {
+    "taskTitle": "Implement user authentication",
+    "priority": "high",
+    "category": "backend"
+  }
+}
+\`\`\`
+
+4. **Check project status:**
+
+\`\`\`json
+{
+  "prompt": "check-project-status"
+}
+\`\`\`
+
+5. **Get code review checklist:**
+
+\`\`\`json
+{
+  "prompt": "code-review-checklist",
+  "args": {
+    "codeLanguage": "TypeScript"
+  }
+}
+\`\`\`
+
+6. **Get deployment checklist:**
+
+\`\`\`json
+{
+  "prompt": "deployment-checklist",
+  "args": {
+    "environment": "production"
+  }
+}
+\`\`\`
+
 ## **Security Considerations**
 
 - **Absolute Paths Required**: \`projectRoot\` must be an absolute path
@@ -202,6 +389,7 @@ When you need to document system architecture:
 - **Type Validation**: \`type\` parameter must be a predefined document type
 - **No Concurrent Writes**: Concurrent write operations are not supported
 - **Initialization Safety**: \`init\` command only creates configuration files, never overwrites existing documents
+- **Read Before Update**: Always read existing content to preserve document continuity
 
 ## **Best Practices**
 
@@ -210,7 +398,8 @@ When you need to document system architecture:
 1. **Run Init Command**: Use \`init\` to set up project configuration
 2. **Check Existing Documents**: Use \`list\` operation to see current state
 3. **Create Core Documents**: Use \`update\` to create essential documents
-4. **Maintain Documentation**: Regularly update documents as project evolves
+4. **Use Prompts**: Leverage prompts for structured guidance
+5. **Maintain Documentation**: Regularly update documents as project evolves
 
 ### **Document Naming Convention**
 
@@ -242,6 +431,15 @@ Specific document content...
 2. **Check Existing Documents**: Use \`list\` operation
 3. **Read Documents**: Use \`read\` operation to get content
 4. **Update Documents**: Use \`update\` operation to modify content
+5. **Use Prompts**: Leverage prompts for structured guidance
+
+### **Prompt Usage Guidelines**
+
+1. **Choose Appropriate Prompt**: Select the right prompt for your task
+2. **Provide Required Parameters**: Fill in necessary parameters
+3. **Review Generated Content**: Always review prompt-generated content
+4. **Customize as Needed**: Modify generated content to fit your specific needs
+5. **Update Documentation**: Always update relevant documentation after using prompts
 
 ## **Quick Start Guide**
 
@@ -293,6 +491,14 @@ Specific document content...
 }
 \`\`\`
 
+### **Step 5: Use Prompts for Guidance**
+
+\`\`\`json
+{
+  "prompt": "check-project-status"
+}
+\`\`\`
+
 ## **Troubleshooting**
 
 ### **Common Errors**
@@ -301,6 +507,7 @@ Specific document content...
 2. **Type Error**: Ensure \`type\` is a predefined document type
 3. **File Not Found**: Use \`update\` operation to create new documents
 4. **Init Error**: Ensure you have write permissions in the project directory
+5. **Prompt Error**: Ensure prompt parameters are correctly formatted
 
 ### **Debugging Tips**
 
@@ -308,6 +515,8 @@ Specific document content...
 - Use \`list\` operation to check project structure
 - Confirm \`.soloflow/\` directory exists after initialization
 - Verify document type is correct
+- Always read existing content before updating
+- Use prompts for structured guidance
 
 ## **Related Documentation**
 
@@ -315,4 +524,9 @@ Specific document content...
 - [system_architecture.md](mdc:.soloflow/system_architecture.md) - Technical architecture design
 - [test_strategy.md](mdc:.soloflow/test_strategy.md) - Testing plans and strategies
 - [tasks.md](mdc:.soloflow/tasks.md) - Project task lists and progress
+
+## **Update History**
+
+- 2025-07-30: Added MCP Prompts support and Read Before Update rule
+- 2025-07-24: Initial version with basic MCP operations
 `; 
