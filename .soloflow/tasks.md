@@ -51,34 +51,37 @@
 
 #### 2.1 测试环境搭建
 
-- [ ] **安装测试依赖**
+- [x] **安装测试依赖**
   ```bash
   npm install --save-dev jest @types/jest ts-jest
   ```
 
-- [ ] **配置 Jest**
+- [x] **配置 Jest**
   ```javascript
-  // jest.config.js
+  // jest.config.cjs
   module.exports = {
     preset: 'ts-jest',
     testEnvironment: 'node',
     roots: ['<rootDir>/tests'],
     testMatch: ['**/*.test.ts'],
-    collectCoverageFrom: [
-      'src/**/*.ts',
-      '!src/**/*.d.ts'
-    ]
+    extensionsToTreatAsEsm: ['.ts'],
+    transform: {
+      '^.+\\.ts$': ['ts-jest', { useESM: true }],
+    },
+    moduleNameMapper: {
+      '^(\\.{1,2}/.*)\\.js$': '$1',
+    },
   };
   ```
 
-- [ ] **创建测试目录结构**
+- [x] **创建测试目录结构**
   ```bash
   mkdir -p tests/{unit,integration,security,fixtures,utils}
   ```
 
 #### 2.2 单元测试实现
 
-- [ ] **路径校验测试**
+- [x] **路径校验测试**
   ```typescript
   // tests/unit/context.test.ts
   describe('Project Path Validation', () => {
@@ -89,7 +92,7 @@
   });
   ```
 
-- [ ] **MCP 操作测试**
+- [x] **MCP 操作测试**
   ```typescript
   // tests/unit/list.test.ts
   describe('List Operation', () => {
@@ -373,7 +376,7 @@
 | 周次 | 主要目标 | 交付物 | 状态 |
 |------|----------|--------|------|
 | 第1周 | 核心架构重构 | 基础 MCP 服务 | ✅ 完成 |
-| 第2周 | 测试框架搭建 | 完整测试套件 | 🔄 进行中 |
+| 第2周 | 测试框架搭建 | 完整测试套件 | 🔄 进行中（基础完成） |
 | 第3周 | 安全性能优化 | 生产就绪代码 | ⏳ 待开始 |
 | 第4周 | 文档部署准备 | 可部署版本 | ⏳ 待开始 |
 | 第5周 | 部署与监控 | 生产环境 | ⏳ 待开始 |
@@ -389,6 +392,7 @@
 
 ## 📝 更新历史
 
+- **2025-07-30**: 完成第二阶段测试框架搭建基础部分，Jest 配置和单元测试框架
 - **2025-07-30**: 更新任务状态，第一阶段完成，开始第二阶段测试框架搭建
 - **2025-07-24**: 初始版本，从 POC 到生产就绪的详细计划
 
