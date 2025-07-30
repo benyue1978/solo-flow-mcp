@@ -418,6 +418,12 @@ MIT License - see [LICENSE](LICENSE) file for details
 
 ## Changelog
 
+### v1.0.2
+- Add comprehensive project documentation (overview, ui_design, deployment, notes)
+- Update README.md with detailed prompts usage guide
+- Add Cursor integration examples for direct prompt usage
+- Improve documentation structure and user experience
+
 ### v1.0.1
 - Add six core prompts for software engineering best practices
 - Add test coverage
