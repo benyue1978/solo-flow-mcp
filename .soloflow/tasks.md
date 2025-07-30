@@ -200,7 +200,7 @@
 - [x] **package.json 配置优化**
   ```json
   {
-    "name": "@benyue1978/solo-flow-mcp",
+    "name": "@benyue1978/soloflow-mcp",
     "version": "1.0.0",
     "description": "MCP server for SoloFlow project documentation management",
     "main": "dist/index.js",
