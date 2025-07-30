@@ -418,6 +418,13 @@ MIT License - see [LICENSE](LICENSE) file for details
 
 ## Changelog
 
+### v1.0.5
+- Add git_commit.mdc rule file for standardized Git commit messages
+- Create git-commit-content.ts with embedded git commit guidelines
+- Update init tool to automatically create git_commit.mdc during project initialization
+- Enhance project setup with Git commit message conventions
+- Follow consistent pattern for rule file creation and management
+
 ### v1.0.4
 - Update soloflow.mdc content with latest MCP Prompts and Read Before Update rules
 - Sync soloflow-content.ts with latest documentation guidelines
