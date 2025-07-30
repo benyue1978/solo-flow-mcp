@@ -1,10 +1,5 @@
 import { join } from 'path';
 import { validateProjectRoot, ensureSoloflowDirectory } from '../context.js';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
 
 /**
  * Initialize project configuration
@@ -44,8 +39,8 @@ export async function initHandler(args: { projectRoot: string }): Promise<{
     const soloflowMdcPath = join(cursorRulesDir, 'soloflow.mdc');
     
     // Read the soloflow.mdc content from resources
-    // Use path relative to the source directory
-    const resourcePath = join(__dirname, '..', '..', 'src', 'resources', 'soloflow.mdc');
+    // Use path relative to the project root
+    const resourcePath = join(process.cwd(), 'src', 'resources', 'soloflow.mdc');
     const soloflowMdcContent = await fs.readFile(resourcePath, 'utf-8');
     
     try {

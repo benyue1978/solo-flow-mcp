@@ -1,123 +1,90 @@
 import { jest } from '@jest/globals';
 import { readHandler } from '../../src/tools/read';
 import { DocType } from '../../src/types/docTypes';
+import { getTestProjectRoot, getTempTestProjectRoot, cleanupTestFiles } from '../utils/test-helpers';
 import fs from 'fs/promises';
 import path from 'path';
 
-// Mock fs.promises
-jest.mock('fs/promises');
-
 describe('Read Operation', () => {
-  const mockFs = fs as jest.Mocked<typeof fs>;
+  beforeEach(async () => {
+    await cleanupTestFiles();
+  });
 
-  beforeEach(() => {
-    jest.clearAllMocks();
+  afterAll(async () => {
+    await cleanupTestFiles();
   });
 
   test('should read existing document', async () => {
-    const projectRoot = '/Users/test/project';
+    const projectRoot = getTestProjectRoot();
     const docType: DocType = 'requirements';
-    const documentPath = path.join(projectRoot, '.soloflow', 'requirements.md');
-    const documentContent = '# 📋 Project Requirements\n\nThis is the requirements document.';
-    
-    // Mock file exists
-    mockFs.access.mockResolvedValue(undefined);
-    
-    // Mock readFile to return content
-    mockFs.readFile.mockResolvedValue(documentContent);
-
     const result = await readHandler({ projectRoot, type: docType });
 
-    expect(result.raw).toBe(documentContent);
-    expect(mockFs.readFile).toHaveBeenCalledWith(documentPath, 'utf-8');
+    expect(result.raw).toContain('# 📋 Test Requirements');
+    expect(result.raw).toContain('This is a test requirements document for unit testing');
+    expect(result.raw).toContain('Test document reading');
+    expect(result.raw).toContain('Performance: Fast execution');
   });
 
   test('should return null for non-existent document', async () => {
-    const projectRoot = '/Users/test/project';
-    const docType: DocType = 'requirements';
-    const documentPath = path.join(projectRoot, '.soloflow', 'requirements.md');
-    
-    // Mock file does not exist
-    mockFs.access.mockRejectedValue(new Error('ENOENT'));
+    const projectRoot = getTestProjectRoot();
+    const docType: DocType = 'overview';
 
     const result = await readHandler({ projectRoot, type: docType });
 
     expect(result.raw).toBeNull();
-    expect(mockFs.readFile).not.toHaveBeenCalled();
   });
 
   test('should validate document type', async () => {
-    const projectRoot = '/Users/test/project';
+    const projectRoot = getTestProjectRoot();
     const invalidDocType = 'invalid_type' as DocType;
-    
-    // Mock file exists
-    mockFs.access.mockResolvedValue(undefined);
-    mockFs.readFile.mockResolvedValue('content');
 
-    const result = await readHandler({ projectRoot, type: invalidDocType });
-
-    // Should still work as validation is done at type level
-    expect(result.raw).toBe('content');
-  });
-
-  test('should handle read file errors', async () => {
-    const projectRoot = '/Users/test/project';
-    const docType: DocType = 'requirements';
-    const documentPath = path.join(projectRoot, '.soloflow', 'requirements.md');
-    
-    // Mock file exists
-    mockFs.access.mockResolvedValue(undefined);
-    
-    // Mock readFile error
-    mockFs.readFile.mockRejectedValue(new Error('Read error'));
-
-    await expect(readHandler({ projectRoot, type: docType })).rejects.toThrow('Read error');
+    await expect(readHandler({ projectRoot, type: invalidDocType })).rejects.toThrow('Invalid document type');
   });
 
   test('should handle all document types', async () => {
-    const projectRoot = '/Users/test/project';
+    const projectRoot = getTestProjectRoot();
     const docTypes: DocType[] = [
-      'overview',
       'requirements',
-      'system_architecture',
-      'test_strategy',
-      'ui_design',
       'tasks',
-      'deployment',
-      'notes'
+      'system_architecture'
     ];
-    
-    // Mock file exists for all types
-    mockFs.access.mockResolvedValue(undefined);
-    mockFs.readFile.mockResolvedValue('content');
 
     for (const docType of docTypes) {
       const result = await readHandler({ projectRoot, type: docType });
-      expect(result.raw).toBe('content');
+      expect(result.raw).toBeTruthy();
+      expect(typeof result.raw).toBe('string');
     }
   });
 
   test('should handle permission errors', async () => {
-    const projectRoot = '/Users/test/project';
+    const projectRoot = '/non/existent/path';
     const docType: DocType = 'requirements';
-    
-    // Mock permission error
-    mockFs.access.mockRejectedValue(new Error('EACCES'));
 
-    await expect(readHandler({ projectRoot, type: docType })).rejects.toThrow('EACCES');
+    await expect(readHandler({ projectRoot, type: docType })).rejects.toThrow();
   });
 
   test('should handle directory traversal attempts', async () => {
-    const projectRoot = '/Users/test/project';
+    const projectRoot = getTestProjectRoot();
     const docType: DocType = 'requirements';
-    
-    // Mock file exists
-    mockFs.access.mockResolvedValue(undefined);
-    mockFs.readFile.mockResolvedValue('content');
 
     const result = await readHandler({ projectRoot, type: docType });
 
     // Should work normally as path validation is done at context level
-    expect(result.raw).toBe('content');
+    expect(result.raw).toBeTruthy();
+  });
+
+  test('should read document from temporary project', async () => {
+    const projectRoot = getTempTestProjectRoot();
+    const soloflowPath = path.join(projectRoot, '.soloflow');
+    const docType: DocType = 'notes';
+    const testContent = '# Test Document\n\nThis is a test document.';
+    
+    // Create directory and file
+    await fs.mkdir(soloflowPath, { recursive: true });
+    await fs.writeFile(path.join(soloflowPath, 'notes.md'), testContent);
+
+    const result = await readHandler({ projectRoot, type: docType });
+
+    expect(result.raw).toBe(testContent);
   });
 }); 

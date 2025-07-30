@@ -1,41 +1,23 @@
 import { jest } from '@jest/globals';
 import { validateProjectRoot, getSoloflowPath, getDocumentPath } from '../../src/context';
 import { DocType } from '../../src/types/docTypes';
+import { getTestProjectRoot, getTestSoloflowPath, getTestDocumentPath } from '../utils/test-helpers';
 import path from 'path';
-import fs from 'fs/promises';
-
-// Mock fs.promises
-jest.mock('fs/promises');
 
 describe('Project Path Validation', () => {
-  const mockFs = fs as jest.Mocked<typeof fs>;
-
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
   describe('validateProjectRoot', () => {
     test('should accept valid absolute path', async () => {
-      const validPath = '/Users/test/project';
+      const testProjectRoot = getTestProjectRoot();
+      const result = validateProjectRoot(testProjectRoot);
 
-      const result = validateProjectRoot(validPath);
-
-      // This test will fail if the path doesn't actually exist
-      // We'll mock the filesystem for this test
-      if (result.isValid) {
-        expect(result.isValid).toBe(true);
-        expect(result.error).toBeNull();
-      } else {
-        // If path doesn't exist, that's also valid behavior
-        expect(result.isValid).toBe(false);
-        expect(result.error).toContain('does not exist');
-      }
+      expect(result.isValid).toBe(true);
+      expect(result.error).toBeUndefined();
     });
 
     test('should reject relative path', async () => {
       const relativePath = './project';
 
-      const result = await validateProjectRoot(relativePath);
+      const result = validateProjectRoot(relativePath);
 
       expect(result.isValid).toBe(false);
       expect(result.error).toContain('must be an absolute path');
@@ -43,18 +25,18 @@ describe('Project Path Validation', () => {
 
     test('should reject system directories', async () => {
       const systemPaths = [
-        '/etc',
-        '/var',
-        '/usr',
-        '/bin',
-        '/sbin',
-        '/dev',
-        '/proc',
-        '/sys'
+        '/etc/test',
+        '/var/test',
+        '/usr/test',
+        '/bin/test',
+        '/sbin/test',
+        '/dev/test',
+        '/proc/test',
+        '/sys/test'
       ];
 
-      for (const path of systemPaths) {
-        const result = validateProjectRoot(path);
+      for (const systemPath of systemPaths) {
+        const result = validateProjectRoot(systemPath);
         expect(result.isValid).toBe(false);
         expect(result.error).toContain('system directories');
       }
@@ -70,19 +52,24 @@ describe('Project Path Validation', () => {
     });
 
     test('should reject if path is not a directory', async () => {
-      const filePath = '/Users/test/file.txt';
+      // Create a temporary file for testing
+      const fs = await import('fs/promises');
+      const tempFile = path.join(__dirname, 'temp-test-file.txt');
+      
+      try {
+        await fs.writeFile(tempFile, 'test content');
+        
+        const result = validateProjectRoot(tempFile);
 
-      const result = validateProjectRoot(filePath);
-
-      // This test will fail if the path doesn't actually exist
-      // We'll check if it's a directory only if the path exists
-      if (result.isValid) {
         expect(result.isValid).toBe(false);
         expect(result.error).toContain('must be a directory');
-      } else {
-        // If path doesn't exist, that's also valid behavior
-        expect(result.isValid).toBe(false);
-        expect(result.error).toContain('does not exist');
+      } finally {
+        // Clean up
+        try {
+          await fs.unlink(tempFile);
+        } catch (error) {
+          // Ignore cleanup errors
+        }
       }
     });
   });
@@ -93,6 +80,15 @@ describe('Project Path Validation', () => {
       const expectedPath = path.join(projectRoot, '.soloflow');
 
       const result = getSoloflowPath(projectRoot);
+
+      expect(result).toBe(expectedPath);
+    });
+
+    test('should work with test project root', () => {
+      const testProjectRoot = getTestProjectRoot();
+      const expectedPath = getTestSoloflowPath();
+
+      const result = getSoloflowPath(testProjectRoot);
 
       expect(result).toBe(expectedPath);
     });
@@ -126,6 +122,16 @@ describe('Project Path Validation', () => {
         const result = getDocumentPath(projectRoot, type);
         expect(result).toBe(path.join(projectRoot, '.soloflow', `${type}.md`));
       });
+    });
+
+    test('should work with test project root', () => {
+      const testProjectRoot = getTestProjectRoot();
+      const docType: DocType = 'requirements';
+      const expectedPath = getTestDocumentPath('requirements');
+
+      const result = getDocumentPath(testProjectRoot, docType);
+
+      expect(result).toBe(expectedPath);
     });
   });
 }); 

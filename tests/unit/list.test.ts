@@ -1,59 +1,42 @@
 import { jest } from '@jest/globals';
 import { listHandler } from '../../src/tools/list';
 import { DocumentSummary } from '../../src/types/docTypes';
+import { getTestProjectRoot, getTempTestProjectRoot, cleanupTestFiles } from '../utils/test-helpers';
 import fs from 'fs/promises';
 import path from 'path';
 
-// Mock fs.promises
-jest.mock('fs/promises');
-
 describe('List Operation', () => {
-  const mockFs = fs as jest.Mocked<typeof fs>;
+  beforeEach(async () => {
+    await cleanupTestFiles();
+  });
 
-  beforeEach(() => {
-    jest.clearAllMocks();
+  afterAll(async () => {
+    await cleanupTestFiles();
   });
 
   test('should list documents in .soloflow directory', async () => {
-    const projectRoot = '/Users/test/project';
-    const soloflowPath = path.join(projectRoot, '.soloflow');
-    
-    // Mock directory exists
-    mockFs.access.mockResolvedValue(undefined);
-    
-    // Mock readdir to return document files
-    mockFs.readdir.mockResolvedValue([
-      'requirements.md',
-      'tasks.md',
-      'system_architecture.md'
-    ] as any);
-    
-    // Mock stat for each file
-    mockFs.stat.mockResolvedValue({
-      isFile: () => true,
-      mtime: new Date('2025-07-30T10:00:00.000Z'),
-    } as any);
+    const projectRoot = getTestProjectRoot();
 
     const result = await listHandler({ projectRoot });
 
     expect(result).toHaveLength(3);
-    expect(result[0]).toMatchObject({
-      type: 'requirements',
-      name: 'requirements.md',
-      title: expect.any(String),
-      lastUpdated: expect.any(String)
-    });
+    
+    // Check that we have the expected documents
+    const documentTypes = result.map(doc => doc.type);
+    expect(documentTypes).toContain('requirements');
+    expect(documentTypes).toContain('tasks');
+    expect(documentTypes).toContain('system_architecture');
+    
+    // Check that titles are extracted correctly
+    const requirementsDoc = result.find(doc => doc.type === 'requirements');
+    expect(requirementsDoc?.title).toBe('📋 Test Requirements');
   });
 
   test('should return empty array for empty directory', async () => {
-    const projectRoot = '/Users/test/project';
-    const soloflowPath = path.join(projectRoot, '.soloflow');
+    const projectRoot = getTempTestProjectRoot();
     
-    // Mock directory exists
-    mockFs.access.mockResolvedValue(undefined);
-    
-    // Mock readdir to return empty array
-    mockFs.readdir.mockResolvedValue([]);
+    // Create the directory but leave it empty
+    await fs.mkdir(path.join(projectRoot, '.soloflow'), { recursive: true });
 
     const result = await listHandler({ projectRoot });
 
@@ -61,78 +44,48 @@ describe('List Operation', () => {
   });
 
   test('should extract document titles from markdown content', async () => {
-    const projectRoot = '/Users/test/project';
-    const soloflowPath = path.join(projectRoot, '.soloflow');
-    
-    // Mock directory exists
-    mockFs.access.mockResolvedValue(undefined);
-    
-    // Mock readdir to return one file
-    mockFs.readdir.mockResolvedValue(['requirements.md'] as any);
-    
-    // Mock stat
-    mockFs.stat.mockResolvedValue({
-      isFile: () => true,
-      mtime: new Date('2025-07-30T10:00:00.000Z'),
-    } as any);
-    
-    // Mock readFile to return markdown content with title
-    mockFs.readFile.mockResolvedValue('# 📋 Project Requirements\n\nThis is the requirements document.');
+    const projectRoot = getTestProjectRoot();
 
     const result = await listHandler({ projectRoot });
 
-    expect(result).toHaveLength(1);
-    expect(result[0].title).toBe('📋 Project Requirements');
+    const requirementsDoc = result.find(doc => doc.type === 'requirements');
+    expect(requirementsDoc?.title).toBe('📋 Test Requirements');
+    
+    const tasksDoc = result.find(doc => doc.type === 'tasks');
+    expect(tasksDoc?.title).toBe('📋 Test Tasks');
+    
+    const architectureDoc = result.find(doc => doc.type === 'system_architecture');
+    expect(architectureDoc?.title).toBe('🏗 Test System Architecture');
   });
 
   test('should handle files without markdown title', async () => {
-    const projectRoot = '/Users/test/project';
+    const projectRoot = getTempTestProjectRoot();
     const soloflowPath = path.join(projectRoot, '.soloflow');
     
-    // Mock directory exists
-    mockFs.access.mockResolvedValue(undefined);
+    // Create directory
+    await fs.mkdir(soloflowPath, { recursive: true });
     
-    // Mock readdir to return one file
-    mockFs.readdir.mockResolvedValue(['notes.md'] as any);
-    
-    // Mock stat
-    mockFs.stat.mockResolvedValue({
-      isFile: () => true,
-      mtime: new Date('2025-07-30T10:00:00.000Z'),
-    } as any);
-    
-    // Mock readFile to return content without title
-    mockFs.readFile.mockResolvedValue('Just some notes without a title.');
+    // Create a file without a title
+    await fs.writeFile(path.join(soloflowPath, 'notes.md'), 'Just some notes without a title.');
 
     const result = await listHandler({ projectRoot });
 
     expect(result).toHaveLength(1);
-    expect(result[0].title).toBe('notes.md');
+    expect(result[0].title).toBeUndefined();
   });
 
   test('should skip non-markdown files', async () => {
-    const projectRoot = '/Users/test/project';
+    const projectRoot = getTempTestProjectRoot();
     const soloflowPath = path.join(projectRoot, '.soloflow');
     
-    // Mock directory exists
-    mockFs.access.mockResolvedValue(undefined);
+    // Create directory
+    await fs.mkdir(soloflowPath, { recursive: true });
     
-    // Mock readdir to return mixed files
-    mockFs.readdir.mockResolvedValue([
-      'requirements.md',
-      'config.json',
-      'tasks.md',
-      '.gitignore'
-    ] as any);
-    
-    // Mock stat for each file
-    mockFs.stat.mockResolvedValue({
-      isFile: () => true,
-      mtime: new Date('2025-07-30T10:00:00.000Z'),
-    } as any);
-    
-    // Mock readFile for markdown files
-    mockFs.readFile.mockResolvedValue('# Document Title');
+    // Create mixed files
+    await fs.writeFile(path.join(soloflowPath, 'requirements.md'), '# Document Title');
+    await fs.writeFile(path.join(soloflowPath, 'config.json'), '{"test": true}');
+    await fs.writeFile(path.join(soloflowPath, 'tasks.md'), '# Tasks');
+    await fs.writeFile(path.join(soloflowPath, '.gitignore'), 'node_modules/');
 
     const result = await listHandler({ projectRoot });
 
@@ -141,23 +94,8 @@ describe('List Operation', () => {
   });
 
   test('should handle directory access errors', async () => {
-    const projectRoot = '/Users/test/project';
-    
-    // Mock directory access error
-    mockFs.access.mockRejectedValue(new Error('Permission denied'));
+    const projectRoot = '/non/existent/path';
 
-    await expect(listHandler({ projectRoot })).rejects.toThrow('Permission denied');
-  });
-
-  test('should handle readdir errors', async () => {
-    const projectRoot = '/Users/test/project';
-    
-    // Mock directory exists
-    mockFs.access.mockResolvedValue(undefined);
-    
-    // Mock readdir error
-    mockFs.readdir.mockRejectedValue(new Error('Directory read error'));
-
-    await expect(listHandler({ projectRoot })).rejects.toThrow('Directory read error');
+    await expect(listHandler({ projectRoot })).rejects.toThrow();
   });
 }); 

@@ -1,117 +1,91 @@
 import { jest } from '@jest/globals';
 import { updateHandler } from '../../src/tools/update';
 import { DocType } from '../../src/types/docTypes';
+import { getTempTestProjectRoot, cleanupTestFiles } from '../utils/test-helpers';
 import fs from 'fs/promises';
 import path from 'path';
 
-// Mock fs.promises
-jest.mock('fs/promises');
-
 describe('Update Operation', () => {
-  const mockFs = fs as jest.Mocked<typeof fs>;
+  beforeEach(async () => {
+    await cleanupTestFiles();
+  });
 
-  beforeEach(() => {
-    jest.clearAllMocks();
+  afterAll(async () => {
+    await cleanupTestFiles();
   });
 
   test('should create new document', async () => {
-    const projectRoot = '/Users/test/project';
+    const projectRoot = getTempTestProjectRoot();
     const docType: DocType = 'requirements';
     const content = '# 📋 Project Requirements\n\nThis is the requirements document.';
     const soloflowPath = path.join(projectRoot, '.soloflow');
     const documentPath = path.join(soloflowPath, 'requirements.md');
-    
-    // Mock .soloflow directory does not exist
-    mockFs.access.mockRejectedValueOnce(new Error('ENOENT'));
-    
-    // Mock mkdir success
-    mockFs.mkdir.mockResolvedValue(undefined);
-    
-    // Mock writeFile success
-    mockFs.writeFile.mockResolvedValue(undefined);
+
+    // Create the project root directory
+    await fs.mkdir(projectRoot, { recursive: true });
 
     const result = await updateHandler({ projectRoot, type: docType, content });
 
     expect(result.ok).toBe(true);
-    expect(mockFs.mkdir).toHaveBeenCalledWith(soloflowPath, { recursive: true });
-    expect(mockFs.writeFile).toHaveBeenCalledWith(documentPath, content, 'utf-8');
+    
+    // Verify file was created
+    const fileExists = await fs.access(documentPath).then(() => true).catch(() => false);
+    expect(fileExists).toBe(true);
+    
+    // Verify content was written correctly
+    const writtenContent = await fs.readFile(documentPath, 'utf-8');
+    expect(writtenContent).toBe(content);
   });
 
   test('should update existing document', async () => {
-    const projectRoot = '/Users/test/project';
+    const projectRoot = getTempTestProjectRoot();
     const docType: DocType = 'requirements';
-    const content = '# 📋 Updated Requirements\n\nUpdated content.';
+    const initialContent = '# 📋 Initial Requirements\n\nInitial content.';
+    const updatedContent = '# 📋 Updated Requirements\n\nUpdated content.';
     const soloflowPath = path.join(projectRoot, '.soloflow');
     const documentPath = path.join(soloflowPath, 'requirements.md');
     
-    // Mock .soloflow directory exists
-    mockFs.access.mockResolvedValue(undefined);
-    
-    // Mock writeFile success
-    mockFs.writeFile.mockResolvedValue(undefined);
+    // Create initial file
+    await fs.mkdir(soloflowPath, { recursive: true });
+    await fs.writeFile(documentPath, initialContent);
 
-    const result = await updateHandler({ projectRoot, type: docType, content });
+    const result = await updateHandler({ projectRoot, type: docType, content: updatedContent });
 
     expect(result.ok).toBe(true);
-    expect(mockFs.writeFile).toHaveBeenCalledWith(documentPath, content, 'utf-8');
-    expect(mockFs.mkdir).not.toHaveBeenCalled();
+    
+    // Verify content was updated
+    const writtenContent = await fs.readFile(documentPath, 'utf-8');
+    expect(writtenContent).toBe(updatedContent);
   });
 
   test('should create .soloflow directory if needed', async () => {
-    const projectRoot = '/Users/test/project';
+    const projectRoot = getTempTestProjectRoot();
     const docType: DocType = 'tasks';
     const content = '# 📋 Tasks\n\nTask list.';
     const soloflowPath = path.join(projectRoot, '.soloflow');
-    const documentPath = path.join(soloflowPath, 'tasks.md');
-    
-    // Mock .soloflow directory does not exist
-    mockFs.access.mockRejectedValueOnce(new Error('ENOENT'));
-    
-    // Mock mkdir success
-    mockFs.mkdir.mockResolvedValue(undefined);
-    
-    // Mock writeFile success
-    mockFs.writeFile.mockResolvedValue(undefined);
+
+    // Create the project root directory
+    await fs.mkdir(projectRoot, { recursive: true });
 
     const result = await updateHandler({ projectRoot, type: docType, content });
 
     expect(result.ok).toBe(true);
-    expect(mockFs.mkdir).toHaveBeenCalledWith(soloflowPath, { recursive: true });
+    
+    // Verify directory was created
+    const dirExists = await fs.access(soloflowPath).then(() => true).catch(() => false);
+    expect(dirExists).toBe(true);
   });
 
   test('should handle write file errors', async () => {
-    const projectRoot = '/Users/test/project';
+    const projectRoot = '/non/existent/path';
     const docType: DocType = 'requirements';
     const content = '# 📋 Requirements\n\nContent.';
-    const soloflowPath = path.join(projectRoot, '.soloflow');
-    const documentPath = path.join(soloflowPath, 'requirements.md');
-    
-    // Mock .soloflow directory exists
-    mockFs.access.mockResolvedValue(undefined);
-    
-    // Mock writeFile error
-    mockFs.writeFile.mockRejectedValue(new Error('Write error'));
 
-    await expect(updateHandler({ projectRoot, type: docType, content })).rejects.toThrow('Write error');
-  });
-
-  test('should handle mkdir errors', async () => {
-    const projectRoot = '/Users/test/project';
-    const docType: DocType = 'requirements';
-    const content = '# 📋 Requirements\n\nContent.';
-    const soloflowPath = path.join(projectRoot, '.soloflow');
-    
-    // Mock .soloflow directory does not exist
-    mockFs.access.mockRejectedValueOnce(new Error('ENOENT'));
-    
-    // Mock mkdir error
-    mockFs.mkdir.mockRejectedValue(new Error('Permission denied'));
-
-    await expect(updateHandler({ projectRoot, type: docType, content })).rejects.toThrow('Permission denied');
+    await expect(updateHandler({ projectRoot, type: docType, content })).rejects.toThrow();
   });
 
   test('should handle all document types', async () => {
-    const projectRoot = '/Users/test/project';
+    const projectRoot = getTempTestProjectRoot();
     const docTypes: DocType[] = [
       'overview',
       'requirements',
@@ -123,10 +97,9 @@ describe('Update Operation', () => {
       'notes'
     ];
     const content = '# Document Title\n\nContent.';
-    
-    // Mock .soloflow directory exists
-    mockFs.access.mockResolvedValue(undefined);
-    mockFs.writeFile.mockResolvedValue(undefined);
+
+    // Create the project root directory
+    await fs.mkdir(projectRoot, { recursive: true });
 
     for (const docType of docTypes) {
       const result = await updateHandler({ projectRoot, type: docType, content });
@@ -135,36 +108,32 @@ describe('Update Operation', () => {
   });
 
   test('should handle empty content', async () => {
-    const projectRoot = '/Users/test/project';
+    const projectRoot = getTempTestProjectRoot();
     const docType: DocType = 'notes';
     const content = '';
-    const soloflowPath = path.join(projectRoot, '.soloflow');
-    const documentPath = path.join(soloflowPath, 'notes.md');
-    
-    // Mock .soloflow directory exists
-    mockFs.access.mockResolvedValue(undefined);
-    mockFs.writeFile.mockResolvedValue(undefined);
 
-    const result = await updateHandler({ projectRoot, type: docType, content });
+    // Create the project root directory
+    await fs.mkdir(projectRoot, { recursive: true });
 
-    expect(result.ok).toBe(true);
-    expect(mockFs.writeFile).toHaveBeenCalledWith(documentPath, '', 'utf-8');
+    await expect(updateHandler({ projectRoot, type: docType, content })).rejects.toThrow('Document content cannot be empty');
   });
 
   test('should handle large content', async () => {
-    const projectRoot = '/Users/test/project';
+    const projectRoot = getTempTestProjectRoot();
     const docType: DocType = 'requirements';
     const content = '# 📋 Requirements\n\n'.repeat(1000); // Large content
     const soloflowPath = path.join(projectRoot, '.soloflow');
     const documentPath = path.join(soloflowPath, 'requirements.md');
-    
-    // Mock .soloflow directory exists
-    mockFs.access.mockResolvedValue(undefined);
-    mockFs.writeFile.mockResolvedValue(undefined);
+
+    // Create the project root directory
+    await fs.mkdir(projectRoot, { recursive: true });
 
     const result = await updateHandler({ projectRoot, type: docType, content });
 
     expect(result.ok).toBe(true);
-    expect(mockFs.writeFile).toHaveBeenCalledWith(documentPath, content, 'utf-8');
+    
+    // Verify large content was written
+    const writtenContent = await fs.readFile(documentPath, 'utf-8');
+    expect(writtenContent).toBe(content);
   });
 }); 

@@ -15,6 +15,10 @@ module.exports = {
   transform: {
     '^.+\\.ts$': ['ts-jest', {
       useESM: true,
+      tsconfig: {
+        module: 'ES2022',
+        target: 'ES2022',
+      },
     }],
   },
   moduleNameMapper: {

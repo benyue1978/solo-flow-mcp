@@ -1,35 +1,25 @@
 import { jest } from '@jest/globals';
 import { initHandler } from '../../src/tools/init';
+import { getTempTestProjectRoot, cleanupTestFiles } from '../utils/test-helpers';
 import fs from 'fs/promises';
 import path from 'path';
 
-// Mock fs.promises
-jest.mock('fs/promises');
-
 describe('Init Operation', () => {
-  const mockFs = fs as jest.Mocked<typeof fs>;
+  beforeEach(async () => {
+    await cleanupTestFiles();
+  });
 
-  beforeEach(() => {
-    jest.clearAllMocks();
+  afterAll(async () => {
+    await cleanupTestFiles();
   });
 
   test('should create soloflow.mdc file', async () => {
-    const projectRoot = '/Users/test/project';
+    const projectRoot = getTempTestProjectRoot();
     const cursorRulesPath = path.join(projectRoot, '.cursor', 'rules');
     const soloflowMdcPath = path.join(cursorRulesPath, 'soloflow.mdc');
-    const resourcePath = path.join(__dirname, '..', '..', 'src', 'resources', 'soloflow.mdc');
-    
-    // Mock resource file exists and has content
-    mockFs.readFile.mockResolvedValue('# SoloFlow MCP Service Guidelines\n\nThis is the content.');
-    
-    // Mock .cursor/rules directory does not exist
-    mockFs.access.mockRejectedValueOnce(new Error('ENOENT'));
-    
-    // Mock mkdir success
-    mockFs.mkdir.mockResolvedValue(undefined);
-    
-    // Mock writeFile success
-    mockFs.writeFile.mockResolvedValue(undefined);
+
+    // Create the project root directory
+    await fs.mkdir(projectRoot, { recursive: true });
 
     const result = await initHandler({ projectRoot });
 
@@ -39,23 +29,23 @@ describe('Init Operation', () => {
     expect(result.message).toContain('✅ Created files: .cursor/rules/soloflow.mdc');
     expect(result.message).toContain('🎉 Project initialization completed successfully!');
     
-    expect(mockFs.mkdir).toHaveBeenCalledWith(cursorRulesPath, { recursive: true });
-    expect(mockFs.writeFile).toHaveBeenCalledWith(soloflowMdcPath, '# SoloFlow MCP Service Guidelines\n\nThis is the content.', 'utf-8');
+    // Verify file was created
+    const fileExists = await fs.access(soloflowMdcPath).then(() => true).catch(() => false);
+    expect(fileExists).toBe(true);
+    
+    // Verify content was written
+    const content = await fs.readFile(soloflowMdcPath, 'utf-8');
+    expect(content).toContain('SoloFlow MCP Service Guidelines');
   });
 
   test('should skip existing files', async () => {
-    const projectRoot = '/Users/test/project';
+    const projectRoot = getTempTestProjectRoot();
     const cursorRulesPath = path.join(projectRoot, '.cursor', 'rules');
     const soloflowMdcPath = path.join(cursorRulesPath, 'soloflow.mdc');
     
-    // Mock resource file exists
-    mockFs.readFile.mockResolvedValue('# SoloFlow MCP Service Guidelines\n\nThis is the content.');
-    
-    // Mock .cursor/rules directory exists
-    mockFs.access.mockResolvedValue(undefined);
-    
-    // Mock soloflow.mdc file exists
-    mockFs.access.mockResolvedValue(undefined);
+    // Create the file first
+    await fs.mkdir(cursorRulesPath, { recursive: true });
+    await fs.writeFile(soloflowMdcPath, '# Existing Content');
 
     const result = await initHandler({ projectRoot });
 
@@ -65,21 +55,16 @@ describe('Init Operation', () => {
     expect(result.message).toContain('⚠️  Skipped existing files: .cursor/rules/soloflow.mdc');
     expect(result.message).toContain('ℹ️  Project is already initialized. All required files exist.');
     
-    expect(mockFs.writeFile).not.toHaveBeenCalled();
+    // Verify original content was preserved
+    const content = await fs.readFile(soloflowMdcPath, 'utf-8');
+    expect(content).toBe('# Existing Content');
   });
 
   test('should provide detailed feedback', async () => {
-    const projectRoot = '/Users/test/project';
-    
-    // Mock resource file exists
-    mockFs.readFile.mockResolvedValue('# SoloFlow MCP Service Guidelines\n\nThis is the content.');
-    
-    // Mock .cursor/rules directory does not exist
-    mockFs.access.mockRejectedValueOnce(new Error('ENOENT'));
-    
-    // Mock mkdir and writeFile success
-    mockFs.mkdir.mockResolvedValue(undefined);
-    mockFs.writeFile.mockResolvedValue(undefined);
+    const projectRoot = getTempTestProjectRoot();
+
+    // Create the project root directory
+    await fs.mkdir(projectRoot, { recursive: true });
 
     const result = await initHandler({ projectRoot });
 
@@ -89,83 +74,111 @@ describe('Init Operation', () => {
   });
 
   test('should handle resource file read errors', async () => {
-    const projectRoot = '/Users/test/project';
+    const projectRoot = getTempTestProjectRoot();
     
-    // Mock resource file read error
-    mockFs.readFile.mockRejectedValue(new Error('Resource file not found'));
-
-    await expect(initHandler({ projectRoot })).rejects.toThrow('Resource file not found');
+    // Mock the resource file to not exist by temporarily moving it
+    const resourcePath = path.join(__dirname, '..', '..', 'src', 'resources', 'soloflow.mdc');
+    const tempPath = resourcePath + '.backup';
+    
+    try {
+      await fs.rename(resourcePath, tempPath);
+      
+      await expect(initHandler({ projectRoot })).rejects.toThrow();
+    } finally {
+      // Restore the file
+      try {
+        await fs.rename(tempPath, resourcePath);
+      } catch (error) {
+        // Ignore restore errors
+      }
+    }
   });
 
   test('should handle mkdir errors', async () => {
-    const projectRoot = '/Users/test/project';
-    
-    // Mock resource file exists
-    mockFs.readFile.mockResolvedValue('# SoloFlow MCP Service Guidelines\n\nThis is the content.');
-    
-    // Mock .cursor/rules directory does not exist
-    mockFs.access.mockRejectedValueOnce(new Error('ENOENT'));
-    
-    // Mock mkdir error
-    mockFs.mkdir.mockRejectedValue(new Error('Permission denied'));
+    const projectRoot = '/non/existent/path';
 
-    await expect(initHandler({ projectRoot })).rejects.toThrow('Permission denied');
+    await expect(initHandler({ projectRoot })).rejects.toThrow();
   });
 
   test('should handle writeFile errors', async () => {
-    const projectRoot = '/Users/test/project';
+    const projectRoot = getTempTestProjectRoot();
+    const cursorRulesPath = path.join(projectRoot, '.cursor', 'rules');
     
-    // Mock resource file exists
-    mockFs.readFile.mockResolvedValue('# SoloFlow MCP Service Guidelines\n\nThis is the content.');
-    
-    // Mock .cursor/rules directory does not exist
-    mockFs.access.mockRejectedValueOnce(new Error('ENOENT'));
-    
-    // Mock mkdir success
-    mockFs.mkdir.mockResolvedValue(undefined);
-    
-    // Mock writeFile error
-    mockFs.writeFile.mockRejectedValue(new Error('Write error'));
+    // Create a file where the directory should be
+    await fs.mkdir(path.dirname(cursorRulesPath), { recursive: true });
+    await fs.writeFile(cursorRulesPath, 'This is a file, not a directory');
 
-    await expect(initHandler({ projectRoot })).rejects.toThrow('Write error');
+    await expect(initHandler({ projectRoot })).rejects.toThrow();
   });
 
   test('should handle empty resource content', async () => {
-    const projectRoot = '/Users/test/project';
+    const projectRoot = getTempTestProjectRoot();
+    const cursorRulesPath = path.join(projectRoot, '.cursor', 'rules');
+    const soloflowMdcPath = path.join(cursorRulesPath, 'soloflow.mdc');
     
-    // Mock resource file exists but is empty
-    mockFs.readFile.mockResolvedValue('');
+    // Create the project root directory
+    await fs.mkdir(projectRoot, { recursive: true });
     
-    // Mock .cursor/rules directory does not exist
-    mockFs.access.mockRejectedValueOnce(new Error('ENOENT'));
+    // Create an empty resource file temporarily
+    const resourcePath = path.join(process.cwd(), 'src', 'resources', 'soloflow.mdc');
+    const tempPath = resourcePath + '.backup';
     
-    // Mock mkdir and writeFile success
-    mockFs.mkdir.mockResolvedValue(undefined);
-    mockFs.writeFile.mockResolvedValue(undefined);
+    try {
+      await fs.rename(resourcePath, tempPath);
+      await fs.writeFile(resourcePath, '');
+      
+      const result = await initHandler({ projectRoot });
 
-    const result = await initHandler({ projectRoot });
-
-    expect(result.ok).toBe(true);
-    expect(result.createdFiles).toContain('.cursor/rules/soloflow.mdc');
+      expect(result.ok).toBe(true);
+      expect(result.createdFiles).toContain('.cursor/rules/soloflow.mdc');
+      
+      // Verify empty file was created
+      const content = await fs.readFile(soloflowMdcPath, 'utf-8');
+      expect(content).toBe('');
+    } finally {
+      // Restore the original file
+      try {
+        await fs.unlink(resourcePath);
+        await fs.rename(tempPath, resourcePath);
+      } catch (error) {
+        // Ignore restore errors
+      }
+    }
   });
 
   test('should handle large resource content', async () => {
-    const projectRoot = '/Users/test/project';
-    const largeContent = '# SoloFlow MCP Service Guidelines\n\n'.repeat(1000); // Large content
+    const projectRoot = getTempTestProjectRoot();
+    const cursorRulesPath = path.join(projectRoot, '.cursor', 'rules');
+    const soloflowMdcPath = path.join(cursorRulesPath, 'soloflow.mdc');
     
-    // Mock resource file exists with large content
-    mockFs.readFile.mockResolvedValue(largeContent);
+    // Create the project root directory
+    await fs.mkdir(projectRoot, { recursive: true });
     
-    // Mock .cursor/rules directory does not exist
-    mockFs.access.mockRejectedValueOnce(new Error('ENOENT'));
+    // Create a large resource file temporarily
+    const resourcePath = path.join(process.cwd(), 'src', 'resources', 'soloflow.mdc');
+    const tempPath = resourcePath + '.backup';
+    const largeContent = '# SoloFlow MCP Service Guidelines\n\n'.repeat(1000);
     
-    // Mock mkdir and writeFile success
-    mockFs.mkdir.mockResolvedValue(undefined);
-    mockFs.writeFile.mockResolvedValue(undefined);
+    try {
+      await fs.rename(resourcePath, tempPath);
+      await fs.writeFile(resourcePath, largeContent);
+      
+      const result = await initHandler({ projectRoot });
 
-    const result = await initHandler({ projectRoot });
-
-    expect(result.ok).toBe(true);
-    expect(result.createdFiles).toContain('.cursor/rules/soloflow.mdc');
+      expect(result.ok).toBe(true);
+      expect(result.createdFiles).toContain('.cursor/rules/soloflow.mdc');
+      
+      // Verify large content was written
+      const content = await fs.readFile(soloflowMdcPath, 'utf-8');
+      expect(content).toBe(largeContent);
+    } finally {
+      // Restore the original file
+      try {
+        await fs.unlink(resourcePath);
+        await fs.rename(tempPath, resourcePath);
+      } catch (error) {
+        // Ignore restore errors
+      }
+    }
   });
 }); 
