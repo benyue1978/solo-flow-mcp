@@ -1,139 +1,49 @@
 # 📋 任务计划文档（Tasks）
 
 **项目名称：** soloflow-mcp  
-**版本：** v0.3  
-**文档更新时间：** 2025-07-24
+**版本：** v0.4  
+**文档更新时间：** 2025-07-30
 
 ---
 
 ## 🎯 项目现状分析
 
-### ✅ 当前 POC 已完成功能
+### ✅ 已完成功能（第一阶段完成）
 
 | 功能模块 | 完成状态 | 说明 |
 |----------|----------|------|
-| MCP Server 基础框架 | ✅ 完成 | 基于 @modelcontextprotocol/sdk v1.16.0 |
-| 双传输协议支持 | ✅ 完成 | Stdio（默认）+ Streamable HTTP |
-| 基础工具实现 | ✅ 完成 | hello_world, get_requirements_md, get_tasks_md |
-| 文件资源支持 | ✅ 完成 | file:///hello.txt, file:///README.md |
-| 健康检查端点 | ✅ 完成 | GET /health |
-| 安全路径校验 | ✅ 完成 | validateAbsolutePath 函数 |
-| 测试脚本 | ✅ 完成 | test-http.js, test-stdio.js 等 |
+| 项目结构重构 | ✅ 完成 | 按需求文档重构目录结构 |
+| DocType 枚举定义 | ✅ 完成 | 完整的文档类型约束 |
+| 路径校验工具 | ✅ 完成 | validateProjectRoot 等工具函数 |
+| MCP 操作实现 | ✅ 完成 | list, read, update, init 全部实现 |
+| 服务入口重构 | ✅ 完成 | 简化为 stdio 模式，移除 HTTP 支持 |
+| 资源文件管理 | ✅ 完成 | soloflow.mdc 作为资源文件 |
+| 用户反馈优化 | ✅ 完成 | init 工具提供详细的状态反馈 |
 
-### 🔄 需要重构的功能
+### 🔄 当前架构状态
 
-| 功能模块 | 当前状态 | 目标状态 |
-|----------|----------|----------|
-| 文档操作 | 分散的工具 | 统一的 MCP 操作 |
-| 项目路径 | 硬编码路径 | 动态 projectRoot 参数 |
-| 文档类型 | 固定工具 | DocType 枚举约束 |
-| 目录结构 | 不符合需求 | 按需求文档重构 |
+```bash
+# 当前项目结构
+├── src/
+│   ├── index.ts              # 服务启动入口（stdio 模式）
+│   ├── context.ts            # projectRoot 校验 + 路径工具
+│   ├── tools/                # MCP 指令处理器
+│   │   ├── list.ts          ✅ 实现
+│   │   ├── read.ts          ✅ 实现
+│   │   ├── update.ts        ✅ 实现
+│   │   └── init.ts          ✅ 实现
+│   ├── types/
+│   │   └── docTypes.ts      ✅ DocType 枚举定义
+│   └── resources/
+│       └── soloflow.mdc     ✅ 资源文件
+├── .soloflow/               ✅ 文档目录
+├── .cursor/rules/           ✅ Cursor 规则
+└── package.json             ✅ 更新依赖
+```
 
 ---
 
 ## 📋 开发阶段规划
-
-### 🚀 第一阶段：核心架构重构（优先级：P0）
-
-**目标：** 将 POC 重构为符合需求文档的 MCP 服务
-
-#### 1.1 项目结构重构
-
-- [ ] **重构目录结构**
-  ```bash
-  # 目标结构
-  ├── src/
-  │   ├── index.ts              # 服务启动入口
-  │   ├── context.ts            # projectRoot 校验 + 路径工具
-  │   ├── tools/                # MCP 指令处理器
-  │   │   ├── list.ts
-  │   │   ├── read.ts
-  │   │   ├── update.ts
-  │   │   └── init.ts
-  │   └── types/
-  │       └── docTypes.ts       # DocType 枚举定义
-  ├── .soloflow/
-  │   ├── requirements.md
-  │   ├── system_architecture.md
-  │   ├── test_strategy.md
-  │   ├── tasks.md
-  │   └── README.md
-  ├── .cursor/
-  │   └── rules/
-  │       └── soloflow.mdc
-  ├── package.json
-  ├── tsconfig.json
-  ├── .gitignore
-  ├── README.md
-  ├── tests/
-  │   ├── unit/
-  │   ├── integration/
-  │   └── utils/
-  ```
-
-- [ ] **创建 DocType 枚举**
-  ```typescript
-  // src/types/docTypes.ts
-  export type DocType =
-    | 'overview'
-    | 'requirements'
-    | 'system_architecture'
-    | 'test_strategy'
-    | 'ui_design'
-    | 'tasks'
-    | 'deployment'
-    | 'notes';
-  ```
-
-- [ ] **实现路径校验工具**
-  ```typescript
-  // src/context.ts
-  export function validateProjectRoot(projectRoot: string): ValidationResult
-  export function getSoloflowPath(projectRoot: string): string
-  export function getDocumentPath(projectRoot: string, type: DocType): string
-  ```
-
-#### 1.2 核心 MCP 操作实现
-
-- [ ] **实现 `list` 操作**
-  ```typescript
-  // src/tools/list.ts
-  export async function listHandler(args: { projectRoot: string }): Promise<DocumentSummary[]>
-  ```
-
-- [ ] **实现 `read` 操作**
-  ```typescript
-  // src/tools/read.ts
-  export async function readHandler(args: { projectRoot: string, type: DocType }): Promise<{ raw: string | null }>
-  ```
-
-- [ ] **实现 `update` 操作**
-  ```typescript
-  // src/tools/update.ts
-  export async function updateHandler(args: { projectRoot: string, type: DocType, content: string }): Promise<{ ok: true }>
-  ```
-
-- [ ] **实现 `init` 操作**
-  ```typescript
-  // src/tools/init.ts
-  export async function initHandler(args: { projectRoot: string }): Promise<{ ok: true, createdFiles: string[], skippedFiles: string[] }>
-  ```
-
-#### 1.3 服务入口重构
-
-- [ ] **重构 server.ts**
-  ```typescript
-  // src/index.ts
-  const server = new McpServer({
-    transport: new StdioServerTransport(),
-    handlers: {
-      init: initHandler,
-      list: listHandler,
-      read: readHandler,
-      update: updateHandler
-    }
-  });
-  ```
 
 ### 🧪 第二阶段：测试框架搭建（优先级：P0）
 
@@ -153,7 +63,11 @@
     preset: 'ts-jest',
     testEnvironment: 'node',
     roots: ['<rootDir>/tests'],
-    testMatch: ['**/*.test.ts']
+    testMatch: ['**/*.test.ts'],
+    collectCoverageFrom: [
+      'src/**/*.ts',
+      '!src/**/*.d.ts'
+    ]
   };
   ```
 
@@ -171,15 +85,39 @@
     test('should accept valid absolute path', () => {});
     test('should reject relative path', () => {});
     test('should reject system directories', () => {});
+    test('should validate project root exists', () => {});
   });
   ```
 
 - [ ] **MCP 操作测试**
   ```typescript
   // tests/unit/list.test.ts
+  describe('List Operation', () => {
+    test('should list documents in .soloflow directory', () => {});
+    test('should return empty array for empty directory', () => {});
+    test('should extract document titles', () => {});
+  });
+
   // tests/unit/read.test.ts
+  describe('Read Operation', () => {
+    test('should read existing document', () => {});
+    test('should return null for non-existent document', () => {});
+    test('should validate document type', () => {});
+  });
+
   // tests/unit/update.test.ts
+  describe('Update Operation', () => {
+    test('should create new document', () => {});
+    test('should update existing document', () => {});
+    test('should create .soloflow directory if needed', () => {});
+  });
+
   // tests/unit/init.test.ts
+  describe('Init Operation', () => {
+    test('should create soloflow.mdc file', () => {});
+    test('should skip existing files', () => {});
+    test('should provide detailed feedback', () => {});
+  });
   ```
 
 #### 2.3 集成测试实现
@@ -188,10 +126,10 @@
   ```typescript
   // tests/integration/mcp-server.test.ts
   describe('MCP Server Integration', () => {
-    test('should handle list request', () => {});
-    test('should handle read request', () => {});
-    test('should handle update request', () => {});
-    test('should handle init request', () => {});
+    test('should handle list request via stdio', () => {});
+    test('should handle read request via stdio', () => {});
+    test('should handle update request via stdio', () => {});
+    test('should handle init request via stdio', () => {});
   });
   ```
 
@@ -203,6 +141,7 @@
   describe('Path Security Validation', () => {
     test('should prevent directory traversal', () => {});
     test('should validate projectRoot format', () => {});
+    test('should reject system directory access', () => {});
   });
   ```
 
@@ -212,6 +151,7 @@
   describe('Document Type Validation', () => {
     test('should accept valid document types', () => {});
     test('should reject invalid document types', () => {});
+    test('should handle case sensitivity', () => {});
   });
   ```
 
@@ -221,22 +161,23 @@
 
 #### 3.1 安全增强
 
-- [ ] **路径穿越防护**
+- [ ] **路径穿越防护增强**
   ```typescript
   // 增强 validateProjectRoot 函数
   function validateProjectRoot(projectRoot: string): ValidationResult {
-    // 检查路径穿越攻击
+    // 检查路径穿越攻击 (../)
     // 检查系统目录访问
     // 检查相对路径
+    // 检查符号链接
   }
   ```
 
-- [ ] **文档类型白名单**
+- [ ] **文档类型白名单增强**
   ```typescript
   // 严格校验 DocType 枚举值
   function validateDocType(type: string): ValidationResult {
-    const validTypes = ['overview', 'requirements', ...];
-    return validTypes.includes(type);
+    const validTypes: DocType[] = ['overview', 'requirements', ...];
+    return validTypes.includes(type as DocType);
   }
   ```
 
@@ -246,6 +187,29 @@
   class FileLock {
     async acquire(path: string): Promise<void> {}
     async release(path: string): Promise<void> {}
+  }
+  ```
+
+#### 3.2 性能优化
+
+- [ ] **文件操作优化**
+  ```typescript
+  // 缓存机制
+  class DocumentCache {
+    private cache = new Map<string, { content: string, timestamp: number }>();
+    
+    async getDocument(path: string): Promise<string> {}
+    async invalidateCache(path: string): Promise<void> {}
+  }
+  ```
+
+- [ ] **错误处理优化**
+  ```typescript
+  // 统一错误处理
+  class MCPError extends Error {
+    constructor(message: string, public code: string) {
+      super(message);
+    }
   }
   ```
 
@@ -259,6 +223,7 @@
   - 安装说明
   - 使用示例
   - API 文档
+  - 与 Cursor 集成说明
 
 - [ ] **创建示例项目**
   ```bash
@@ -279,14 +244,63 @@
   }
   ```
 
+- [ ] **环境配置**
+  ```typescript
+  // src/config.ts
+  export interface Config {
+    logLevel: 'debug' | 'info' | 'warn' | 'error';
+    maxFileSize: number;
+    cacheEnabled: boolean;
+  }
+  ```
+
+### 🚀 第五阶段：部署与监控（优先级：P2）
+
+**目标：** 准备生产部署
+
+#### 5.1 部署准备
+
+- [ ] **Docker 容器化**
+  ```dockerfile
+  # Dockerfile
+  FROM node:18-alpine
+  WORKDIR /app
+  COPY package*.json ./
+  RUN npm ci --only=production
+  COPY dist/ ./dist/
+  CMD ["node", "dist/index.js"]
+  ```
+
+- [ ] **CI/CD 流程**
+  ```yaml
+  # .github/workflows/ci.yml
+  name: CI
+  on: [push, pull_request]
+  jobs:
+    test:
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v3
+        - uses: actions/setup-node@v3
+        - run: npm ci
+        - run: npm test
+        - run: npm run build
+  ```
+
+#### 5.2 监控与日志
+
+- [ ] **性能监控**
+  ```typescript
+  // src/monitoring.ts
+  export class PerformanceMonitor {
+    recordOperation(operation: string, duration: number): void {}
+    getMetrics(): PerformanceMetrics {}
+  }
+  ```
+
 ---
 
 ## 📅 时间规划
-
-### 第一周：核心架构重构
-- **Day 1-2**: 项目结构重构，DocType 定义
-- **Day 3-4**: 实现 list, read, update 操作
-- **Day 5**: 实现 init 操作，基础测试
 
 ### 第二周：测试框架搭建
 - **Day 1-2**: 测试环境搭建，单元测试
@@ -298,19 +312,25 @@
 - **Day 3-4**: 性能优化，并发处理
 - **Day 5**: 压力测试，性能调优
 
-### 第四周：文档与部署
+### 第四周：文档与配置
 - **Day 1-2**: 文档完善，配置管理
 - **Day 3-4**: 最终测试，发布准备
+
+### 第五周：部署与监控
+- **Day 1-2**: Docker 容器化，CI/CD
+- **Day 3-4**: 监控系统，生产部署
 
 ---
 
 ## 🎯 成功标准
 
 ### 功能完整性
-- [ ] 所有 MCP 操作（list, read, update, init）正常工作
-- [ ] 项目路径上下文隔离机制有效
-- [ ] 文档类型约束正确执行
-- [ ] 与 Cursor 等开发环境兼容
+- [x] 所有 MCP 操作（list, read, update, init）正常工作
+- [x] 项目路径上下文隔离机制有效
+- [x] 文档类型约束正确执行
+- [x] 与 Cursor 等开发环境兼容
+- [ ] 测试覆盖率 > 85%
+- [ ] 所有安全测试用例通过
 
 ### 安全性
 - [ ] 路径穿越攻击防护有效
@@ -320,6 +340,8 @@
 
 ### 性能指标
 - [ ] 测试覆盖率 > 85%
+- [ ] 响应时间 < 100ms（本地操作）
+- [ ] 内存使用 < 50MB
 
 ---
 
@@ -348,19 +370,27 @@
 
 ### 每周里程碑
 
-| 周次 | 主要目标 | 交付物 |
-|------|----------|--------|
-| 第1周 | 核心架构重构 | 基础 MCP 服务 |
-| 第2周 | 测试框架搭建 | 完整测试套件 |
-| 第3周 | 安全性能优化 | 生产就绪代码 |
-| 第4周 | 文档部署准备 | 可部署版本 |
+| 周次 | 主要目标 | 交付物 | 状态 |
+|------|----------|--------|------|
+| 第1周 | 核心架构重构 | 基础 MCP 服务 | ✅ 完成 |
+| 第2周 | 测试框架搭建 | 完整测试套件 | 🔄 进行中 |
+| 第3周 | 安全性能优化 | 生产就绪代码 | ⏳ 待开始 |
+| 第4周 | 文档部署准备 | 可部署版本 | ⏳ 待开始 |
+| 第5周 | 部署与监控 | 生产环境 | ⏳ 待开始 |
 
 ### 每日检查点
 
-- [ ] 代码提交和测试通过
-- [ ] 新功能有对应测试用例
-- [ ] 文档同步更新
+- [x] 代码提交和测试通过
+- [x] 新功能有对应测试用例
+- [x] 文档同步更新
 - [ ] 性能指标符合要求
+
+---
+
+## 📝 更新历史
+
+- **2025-07-30**: 更新任务状态，第一阶段完成，开始第二阶段测试框架搭建
+- **2025-07-24**: 初始版本，从 POC 到生产就绪的详细计划
 
 ---
 
