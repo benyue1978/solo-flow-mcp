@@ -13,7 +13,12 @@
     "test-absolute-paths": "node test-absolute-paths.js",
     "test-readme": "node test-readme.js",
     "inspector": "npx @modelcontextprotocol/inspector node dist/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:unit": "jest tests/unit",
+    "test:integration": "jest tests/integration",
+    "test:security": "jest tests/security"
   },
   "keywords": [
     "mcp",
@@ -27,7 +32,10 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
+    "@types/jest": "^30.0.0",
     "@types/node": "^20.10.0",
+    "jest": "^30.0.5",
+    "ts-jest": "^29.4.0",
     "typescript": "^5.3.0"
   }
 }
