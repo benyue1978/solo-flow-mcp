@@ -7,6 +7,7 @@ A Model Context Protocol (MCP) server for managing project documentation through
 - 🚀 **MCP Protocol Support**: Complete Model Context Protocol implementation
 - 📁 **Document Management**: Automatically manage project documents in `.soloflow/` directory
 - 🔧 **Four Core Operations**: `list`, `read`, `update`, `init`
+- 🎯 **Six Core Prompts**: Built-in prompts for software engineering best practices
 - 🛡️ **Security Isolation**: Path isolation based on `projectRoot`
 - 📝 **Markdown Support**: Complete Markdown document format support
 - 🎯 **Cursor Integration**: Perfect support for Cursor IDE integration
@@ -63,6 +64,17 @@ In Cursor, AI assistants can now:
 - Update document content: `update` operation
 - Initialize project configuration: `init` operation
 
+### 4. Using Prompts in Cursor
+
+You can directly use prompts in Cursor's chat dialog by typing:
+
+- `/soloflow-mcp/init-project` - Initialize project documentation structure
+- `/soloflow-mcp/create-doc-template` - Create standard document templates
+- `/soloflow-mcp/add-task` - Add new tasks to project
+- `/soloflow-mcp/check-project-status` - Check project status and documentation completeness
+- `/soloflow-mcp/code-review-checklist` - Get code review checklist
+- `/soloflow-mcp/deployment-checklist` - Get deployment preparation checklist
+
 ## Supported Document Types
 
 | Document Type | Filename | Purpose |
@@ -78,7 +90,9 @@ In Cursor, AI assistants can now:
 
 ## MCP Operations
 
-### list - List Documents
+### Core Operations
+
+#### list - List Documents
 
 List all documents in the `.soloflow/` directory:
 
@@ -174,6 +188,61 @@ Initialize project configuration, create `.cursor/rules/soloflow.mdc` file:
   "message": "Project initialized successfully. Created .cursor/rules/soloflow.mdc"
 }
 ```
+
+### Built-in Prompts
+
+SoloFlow MCP includes 6 core prompts designed for software engineering best practices:
+
+#### init-project
+Initialize project documentation structure and create basic document templates.
+
+**Usage in Cursor**: Type `/soloflow-mcp/init-project` in the chat dialog
+
+**Parameters**:
+- `projectName` (optional): Project name for customization
+
+#### create-doc-template
+Create standard document templates for different document types.
+
+**Usage in Cursor**: Type `/soloflow-mcp/create-doc-template` in the chat dialog
+
+**Parameters**:
+- `docType` (optional): Document type (overview, requirements, etc.)
+- `projectName` (optional): Project name for template customization
+
+#### add-task
+Add new tasks to the project task list.
+
+**Usage in Cursor**: Type `/soloflow-mcp/add-task` in the chat dialog
+
+**Parameters**:
+- `taskTitle` (optional): Task title
+- `priority` (optional): Task priority (high, medium, low)
+- `category` (optional): Task category (backend, frontend, testing, etc.)
+- `estimatedTime` (optional): Estimated time to complete
+
+#### check-project-status
+Analyze project documentation completeness and task progress.
+
+**Usage in Cursor**: Type `/soloflow-mcp/check-project-status` in the chat dialog
+
+**Parameters**: None (automatically analyzes current project)
+
+#### code-review-checklist
+Get a standard code review checklist.
+
+**Usage in Cursor**: Type `/soloflow-mcp/code-review-checklist` in the chat dialog
+
+**Parameters**:
+- `codeLanguage` (optional): Programming language (TypeScript, Python, etc.)
+
+#### deployment-checklist
+Get a deployment preparation checklist.
+
+**Usage in Cursor**: Type `/soloflow-mcp/deployment-checklist` in the chat dialog
+
+**Parameters**:
+- `environment` (optional): Deployment environment (production, staging, development)
 
 ## Security Features
 
@@ -296,6 +365,19 @@ npx @benyue1978/soloflow-mcp update \
    - Update document content
    - Manage project configuration
 
+### Example 4: Using Prompts in Cursor
+
+1. Configure Cursor settings (as shown above)
+2. In Cursor's chat dialog, type any of these prompts:
+   - `/soloflow-mcp/init-project` - Initialize project documentation
+   - `/soloflow-mcp/create-doc-template` - Create document templates
+   - `/soloflow-mcp/add-task` - Add new tasks
+   - `/soloflow-mcp/check-project-status` - Check project status
+   - `/soloflow-mcp/code-review-checklist` - Get code review checklist
+   - `/soloflow-mcp/deployment-checklist` - Get deployment checklist
+
+3. The AI will automatically execute the prompt and update your project documentation
+
 ## Troubleshooting
 
 ### Common Issues
@@ -336,6 +418,12 @@ MIT License - see [LICENSE](LICENSE) file for details
 
 ## Changelog
 
+### v1.0.1
+- Add six core prompts for software engineering best practices
+- Add test coverage
+- Add Cursor integration support
+- Add NPM package release
+
 ### v1.0.0
 - Initial version release
 - Support for list, read, update, init operations
@@ -346,5 +434,5 @@ MIT License - see [LICENSE](LICENSE) file for details
 ## Contact
 
 - Author: SongYue <yuesong@gmail.com>
-- Project URL: https://github.com/benyue1978/solo-flow-mcp
-- NPM Package: https://www.npmjs.com/package/@benyue1978/soloflow-mcp
+- Project URL: <https://github.com/benyue1978/solo-flow-mcp>
+- NPM Package: <https://www.npmjs.com/package/@benyue1978/soloflow-mcp>
