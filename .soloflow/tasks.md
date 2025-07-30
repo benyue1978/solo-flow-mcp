@@ -160,91 +160,11 @@
   - ✅ 正确解析 JSON 输出
   - ✅ 验证所有 MCP 操作
 
-#### 2.4 安全测试实现
-
-- [ ] **路径安全测试**
-  ```typescript
-  // tests/security/path-validation.test.ts
-  describe('Path Security Validation', () => {
-    test('should prevent directory traversal', () => {});
-    test('should validate projectRoot format', () => {});
-    test('should reject system directory access', () => {});
-  });
-  ```
-
-- [ ] **文档类型校验测试**
-  ```typescript
-  // tests/security/doc-type-validation.test.ts
-  describe('Document Type Validation', () => {
-    test('should accept valid document types', () => {});
-    test('should reject invalid document types', () => {});
-    test('should handle case sensitivity', () => {});
-  });
-  ```
-
-### 🔐 第三阶段：安全与性能优化（优先级：P1）
-
-**目标：** 确保安全性和性能符合要求
-
-#### 3.1 安全增强
-
-- [ ] **路径穿越防护增强**
-  ```typescript
-  // 增强 validateProjectRoot 函数
-  function validateProjectRoot(projectRoot: string): ValidationResult {
-    // 检查路径穿越攻击 (../)
-    // 检查系统目录访问
-    // 检查相对路径
-    // 检查符号链接
-  }
-  ```
-
-- [ ] **文档类型白名单增强**
-  ```typescript
-  // 严格校验 DocType 枚举值
-  function validateDocType(type: string): ValidationResult {
-    const validTypes: DocType[] = ['overview', 'requirements', ...];
-    return validTypes.includes(type as DocType);
-  }
-  ```
-
-- [ ] **并发写入保护**
-  ```typescript
-  // 实现文件锁机制
-  class FileLock {
-    async acquire(path: string): Promise<void> {}
-    async release(path: string): Promise<void> {}
-  }
-  ```
-
-#### 3.2 性能优化
-
-- [ ] **文件操作优化**
-  ```typescript
-  // 缓存机制
-  class DocumentCache {
-    private cache = new Map<string, { content: string, timestamp: number }>();
-    
-    async getDocument(path: string): Promise<string> {}
-    async invalidateCache(path: string): Promise<void> {}
-  }
-  ```
-
-- [ ] **错误处理优化**
-  ```typescript
-  // 统一错误处理
-  class MCPError extends Error {
-    constructor(message: string, public code: string) {
-      super(message);
-    }
-  }
-  ```
-
-### 📚 第四阶段：文档与配置（优先级：P1）
+### 📚 第三阶段：文档与配置（优先级：P1）
 
 **目标：** 完善项目文档和配置
 
-#### 4.1 文档完善
+#### 3.1 文档完善
 
 - [ ] **更新 README.md**
   - 安装说明
@@ -259,93 +179,249 @@
   touch examples/test-project/.soloflow/{overview,requirements}.md
   ```
 
-#### 4.2 配置管理
-
-- [ ] **日志系统**
-  ```typescript
-  // src/logger.ts
-  export class Logger {
-    info(message: string): void {}
-    error(message: string, error?: Error): void {}
-    debug(message: string): void {}
-  }
-  ```
+#### 3.2 配置管理
 
 - [ ] **环境配置**
-  ```typescript
-  // src/config.ts
-  export interface Config {
-    logLevel: 'debug' | 'info' | 'warn' | 'error';
-    maxFileSize: number;
-    cacheEnabled: boolean;
+  - 开发环境配置
+  - 生产环境配置
+  - 日志系统集成
+
+- [ ] **构建优化**
+  - TypeScript 编译优化
+  - 代码压缩和打包
+  - 依赖树优化
+
+### 🚀 第四阶段：发布与部署（优先级：P0）
+
+**目标：** 实现 npm 包发布，支持 npx 安装和 Cursor 集成
+
+#### 4.1 NPM 包发布准备
+
+- [ ] **package.json 配置优化**
+  ```json
+  {
+    "name": "@benyue1978/solo-flow-mcp",
+    "version": "1.0.0",
+    "description": "MCP server for SoloFlow project documentation management",
+    "main": "dist/index.js",
+    "bin": {
+      "soloflow-mcp": "dist/index.js"
+    },
+    "files": [
+      "dist/**/*",
+      "README.md",
+      "LICENSE"
+    ],
+    "keywords": ["mcp", "cursor", "documentation", "project-management"],
+    "author": "SongYue <yusong@gmail.com>",
+    "license": "MIT",
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/benyue1978/solo-flow-mcp.git"
+    },
+    "publishConfig": {
+      "access": "public"
+    }
   }
   ```
 
-### 🚀 第五阶段：部署与监控（优先级：P2）
-
-**目标：** 准备生产部署
-
-#### 5.1 部署准备
-
-- [ ] **Docker 容器化**
-  ```dockerfile
-  # Dockerfile
-  FROM node:18-alpine
-  WORKDIR /app
-  COPY package*.json ./
-  RUN npm ci --only=production
-  COPY dist/ ./dist/
-  CMD ["node", "dist/index.js"]
+- [ ] **构建脚本优化**
+  ```json
+  {
+    "scripts": {
+      "build": "tsc && npm run copy-resources",
+      "copy-resources": "cp -r src/resources dist/",
+      "prepublishOnly": "npm run build && npm test",
+      "postpublish": "echo 'Package published successfully!'"
+    }
+  }
   ```
 
-- [ ] **CI/CD 流程**
-  ```yaml
-  # .github/workflows/ci.yml
-  name: CI
-  on: [push, pull_request]
-  jobs:
-    test:
-      runs-on: ubuntu-latest
-      steps:
-        - uses: actions/checkout@v3
-        - uses: actions/setup-node@v3
-        - run: npm ci
-        - run: npm test
-        - run: npm run build
+- [ ] **入口文件配置**
+  ```javascript
+  // dist/index.js
+  #!/usr/bin/env node
+  import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/index.js';
+  import { SoloFlowMCPServer } from './server.js';
+  
+  const server = new SoloFlowMCPServer();
+  const transport = new StdioServerTransport();
+  
+  server.listen(transport);
   ```
 
-#### 5.2 监控与日志
+#### 4.2 NPM 发布流程
+
+- [ ] **NPM 账号配置**
+  ```bash
+  # 登录 NPM
+  npm login
+  npm whoami
+  ```
+
+- [ ] **包名验证和注册**
+  ```bash
+  # 检查包名可用性
+  npm view @benyue1978/solo-flow-mcp
+  npm publish --dry-run
+  ```
+
+- [ ] **发布流程测试**
+  ```bash
+  # 本地测试发布
+  npm pack
+  npm publish --dry-run
+  ```
+
+#### 4.3 Npx 支持实现
+
+- [ ] **可执行文件配置**
+  ```json
+  {
+    "bin": {
+      "soloflow-mcp": "./dist/index.js"
+    }
+  }
+  ```
+
+- [ ] **Shebang 和权限设置**
+  ```bash
+  # 确保文件可执行
+  chmod +x dist/index.js
+  ```
+
+- [ ] **全局安装测试**
+  ```bash
+  # 测试 npx 安装
+  npx @benyue1978/solo-flow-mcp --help
+  ```
+
+#### 4.4 Cursor 集成文档
+
+- [ ] **Cursor 配置文档**
+  ```json
+  // .cursor/settings.json
+  {
+    "mcpServers": {
+      "soloflow-mcp": {
+        "command": "npx",
+        "args": ["@benyue1978/solo-flow-mcp"]
+      }
+    }
+  }
+  ```
+
+- [ ] **使用示例文档**
+  ```markdown
+  ## 在 Cursor 中使用 SoloFlow MCP
+  
+  ### 安装
+  ```bash
+  # 无需安装，直接使用 npx
+  npx @benyue1978/solo-flow-mcp
+  ```
+  
+  ### 配置
+  在项目根目录创建 `.cursor/settings.json`：
+  ```json
+  {
+    "mcpServers": {
+      "soloflow-mcp": {
+        "command": "npx",
+        "args": ["@benyue1978/solo-flow-mcp"]
+      }
+    }
+  }
+  ```
+  
+  ### 使用
+  - 在 Cursor 中，AI 助手可以访问 `.soloflow/` 目录下的文档
+  - 支持 list, read, update, init 操作
+  - 自动管理项目文档结构
+  ```
+
+#### 4.5 发布验证
+
+- [ ] **功能验证**
+  ```bash
+  # 测试 npx 安装和运行
+  npx @benyue1978/solo-flow-mcp
+  ```
+
+- [ ] **集成测试**
+  ```bash
+  # 在真实 Cursor 环境中测试
+  # 验证 MCP 协议通信
+  # 验证文档操作功能
+  ```
+
+- [ ] **性能测试**
+  ```bash
+  # 测试启动时间
+  # 测试内存使用
+  # 测试并发操作
+  ```
+
+### 🔧 第五阶段：安全与性能优化（优先级：P1）
+
+**目标：** 提升安全性和性能
+
+#### 5.1 安全增强
+
+- [ ] **路径穿越防护增强**
+  - 更严格的路径验证
+  - 符号链接检测
+  - 目录遍历攻击防护
+
+- [ ] **文档类型白名单增强**
+  - 更严格的类型校验
+  - 文件扩展名验证
+  - 内容格式验证
+
+- [ ] **并发写入保护**
+  - 文件锁机制
+  - 原子操作保证
+  - 冲突检测和解决
+
+#### 5.2 性能优化
+
+- [ ] **文件操作优化**
+  - 异步操作优化
+  - 缓存机制
+  - 批量操作支持
+
+- [ ] **错误处理优化**
+  - 更详细的错误信息
+  - 错误恢复机制
+  - 日志记录优化
+
+### 📊 第六阶段：监控与维护（优先级：P2）
+
+**目标：** 建立监控和维护体系
+
+#### 6.1 监控系统
 
 - [ ] **性能监控**
-  ```typescript
-  // src/monitoring.ts
-  export class PerformanceMonitor {
-    recordOperation(operation: string, duration: number): void {}
-    getMetrics(): PerformanceMetrics {}
-  }
-  ```
+  - 响应时间监控
+  - 内存使用监控
+  - 错误率监控
 
----
+- [ ] **使用统计**
+  - 下载量统计
+  - 使用频率统计
+  - 用户反馈收集
 
-## 📅 时间规划
+#### 6.2 维护计划
 
-### 第二周：测试框架搭建
-- **Day 1-2**: 测试环境搭建，单元测试
-- **Day 3-4**: 集成测试，安全测试
-- **Day 5**: 性能测试，测试覆盖率
+- [ ] **版本管理**
+  - 语义化版本控制
+  - 变更日志维护
+  - 向后兼容性保证
 
-### 第三周：安全与性能优化
-- **Day 1-2**: 安全增强，路径校验
-- **Day 3-4**: 性能优化，并发处理
-- **Day 5**: 压力测试，性能调优
-
-### 第四周：文档与配置
-- **Day 1-2**: 文档完善，配置管理
-- **Day 3-4**: 最终测试，发布准备
-
-### 第五周：部署与监控
-- **Day 1-2**: Docker 容器化，CI/CD
-- **Day 3-4**: 监控系统，生产部署
+- [ ] **文档维护**
+  - API 文档更新
+  - 使用指南维护
+  - 故障排除指南
 
 ---
 
@@ -358,17 +434,16 @@
 - [x] 与 Cursor 等开发环境兼容
 - [ ] 测试覆盖率 > 85%
 - [ ] 所有安全测试用例通过
+- [ ] NPM 包成功发布
+- [ ] Npx 安装和使用正常
+- [ ] Cursor 集成验证通过
 
-### 安全性
-- [ ] 路径穿越攻击防护有效
-- [ ] 文档类型白名单校验通过
-- [ ] 并发写入保护机制正常
-- [ ] 所有安全测试用例通过
-
-### 性能指标
-- [ ] 测试覆盖率 > 85%
-- [ ] 响应时间 < 100ms（本地操作）
-- [ ] 内存使用 < 50MB
+### 发布标准
+- [ ] NPM 包可正常安装：`npm install @benyue1978/solo-flow-mcp`
+- [ ] Npx 可正常使用：`npx @benyue1978/solo-flow-mcp`
+- [ ] Cursor 配置后 MCP 服务正常工作
+- [ ] 所有测试在发布版本中通过
+- [ ] 文档完整且准确
 
 ---
 
@@ -382,6 +457,8 @@
 | 文件系统权限问题 | 中 | 权限检查，错误处理 |
 | 并发写入冲突 | 中 | 文件锁机制，重试逻辑 |
 | 性能瓶颈 | 低 | 性能监控，优化算法 |
+| NPM 包名冲突 | 高 | 提前验证包名可用性 |
+| Npx 执行权限问题 | 中 | 正确的 shebang 和权限设置 |
 
 ### 项目风险
 
@@ -390,6 +467,8 @@
 | 需求变更 | 中 | 保持架构灵活性 |
 | 时间延期 | 中 | 优先级管理，并行开发 |
 | 测试覆盖不足 | 高 | 自动化测试，持续集成 |
+| 发布流程问题 | 高 | 充分的发布前测试 |
+| 用户反馈处理 | 中 | 建立反馈收集和处理机制 |
 
 ---
 
@@ -400,10 +479,10 @@
 | 周次 | 主要目标 | 交付物 | 状态 |
 |------|----------|--------|------|
 | 第1周 | 核心架构重构 | 基础 MCP 服务 | ✅ 完成 |
-| 第2周 | 测试框架搭建 | 完整测试套件 | 🔄 进行中（基础完成） |
-| 第3周 | 安全性能优化 | 生产就绪代码 | ⏳ 待开始 |
-| 第4周 | 文档部署准备 | 可部署版本 | ⏳ 待开始 |
-| 第5周 | 部署与监控 | 生产环境 | ⏳ 待开始 |
+| 第2周 | 测试框架搭建 | 完整测试套件 | ✅ 完成 |
+| 第3周 | 发布准备 | NPM 包和 npx 支持 | 🔄 进行中 |
+| 第4周 | 安全性能优化 | 生产就绪代码 | ⏳ 待开始 |
+| 第5周 | 监控与维护 | 完整部署版本 | ⏳ 待开始 |
 
 ### 每日检查点
 
@@ -411,11 +490,13 @@
 - [x] 新功能有对应测试用例
 - [x] 文档同步更新
 - [ ] 性能指标符合要求
+- [ ] 发布流程验证通过
 
 ---
 
 ## 📝 更新历史
 
+- **2025-07-30**: 添加第四阶段发布与部署任务，包含 NPM 包发布、npx 支持、Cursor 集成
 - **2025-07-30**: 完成第二阶段测试框架搭建基础部分，Jest 配置和单元测试框架
 - **2025-07-30**: 更新任务状态，第一阶段完成，开始第二阶段测试框架搭建
 - **2025-07-24**: 初始版本，从 POC 到生产就绪的详细计划

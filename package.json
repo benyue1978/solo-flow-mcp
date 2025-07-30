@@ -1,11 +1,37 @@
 {
-  "name": "solo-flow-mcp",
+  "name": "@benyue1978/solo-flow-mcp",
   "version": "1.0.0",
-  "description": "MCP Server with stdio support for local integration",
+  "description": "MCP server for SoloFlow project documentation management",
   "main": "dist/index.js",
+  "bin": {
+    "soloflow-mcp": "dist/index.js"
+  },
   "type": "module",
+  "files": [
+    "dist/**/*",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "mcp",
+    "cursor",
+    "documentation",
+    "project-management",
+    "model-context-protocol",
+    "stdio"
+  ],
+  "author": "SongYue <yuesong@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/benyue1978/solo-flow-mcp.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && npm run copy-resources",
+    "copy-resources": "cp -r src/resources dist/",
     "start": "node dist/index.js",
     "dev": "tsc && node dist/index.js",
     "test-stdio": "node test-stdio.js",
@@ -18,15 +44,10 @@
     "test:coverage": "jest --coverage",
     "test:unit": "jest tests/unit",
     "test:integration": "jest tests/integration",
-    "test:security": "jest tests/security"
+    "test:security": "jest tests/security",
+    "prepublishOnly": "npm run build && npm test",
+    "postpublish": "echo 'Package published successfully!'"
   },
-  "keywords": [
-    "mcp",
-    "model-context-protocol",
-    "stdio"
-  ],
-  "author": "",
-  "license": "MIT",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.16.0",
     "zod": "^3.25.76"
