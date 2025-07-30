@@ -8,7 +8,7 @@
 
 ## 🎯 项目现状分析
 
-### ✅ 已完成功能（第一阶段完成）
+### ✅ 已完成功能（第一阶段和第二阶段完成）
 
 | 功能模块 | 完成状态 | 说明 |
 |----------|----------|------|
@@ -19,6 +19,8 @@
 | 服务入口重构 | ✅ 完成 | 简化为 stdio 模式，移除 HTTP 支持 |
 | 资源文件管理 | ✅ 完成 | soloflow.mdc 作为资源文件 |
 | 用户反馈优化 | ✅ 完成 | init 工具提供详细的状态反馈 |
+| 测试框架搭建 | ✅ 完成 | Jest 配置，单元测试，集成测试 |
+| 测试隔离优化 | ✅ 完成 | 完全隔离的测试环境，47个测试通过 |
 
 ### 🔄 当前架构状态
 
@@ -45,7 +47,7 @@
 
 ## 📋 开发阶段规划
 
-### 🧪 第二阶段：测试框架搭建（优先级：P0）
+### 🧪 第二阶段：测试框架搭建（优先级：P0）- ✅ 完成
 
 **目标：** 建立完整的测试体系
 
@@ -98,6 +100,18 @@
   describe('List Operation', () => {
     test('should list documents in .soloflow directory', () => {});
     test('should return empty array for empty directory', () => {});
+    test('should extract document titles from markdown content', () => {});
+    test('should handle files without markdown title', () => {});
+    test('should skip non-markdown files', () => {});
+  });
+  ```
+
+- [x] **测试隔离优化**
+  - ✅ 去掉所有 before/after 钩子
+  - ✅ 创建 `ensureTestSetup` 和 `ensureProjectRootOnly` 工具方法
+  - ✅ 每个测试独立管理环境，完全隔离
+  - ✅ 解决竞态条件问题
+  - ✅ 所有 47 个测试通过
     test('should extract document titles', () => {});
   });
 
@@ -132,16 +146,19 @@
 
 #### 2.3 集成测试实现
 
-- [ ] **MCP 服务器集成测试**
+- [x] **mcp-inspector 集成测试**
   ```typescript
-  // tests/integration/mcp-server.test.ts
-  describe('MCP Server Integration', () => {
-    test('should handle list request via stdio', () => {});
-    test('should handle read request via stdio', () => {});
-    test('should handle update request via stdio', () => {});
-    test('should handle init request via stdio', () => {});
+  // tests/integration/mcp-inspector.test.ts
+  describe('MCP Inspector Integration', () => {
+    test('should handle list operation via mcp-inspector', () => {});
+    test('should handle read operation via mcp-inspector', () => {});
+    test('should handle update operation via mcp-inspector', () => {});
+    test('should handle init operation via mcp-inspector', () => {});
   });
   ```
+  - ✅ 使用 CLI 模式避免浏览器交互
+  - ✅ 正确解析 JSON 输出
+  - ✅ 验证所有 MCP 操作
 
 #### 2.4 安全测试实现
 

@@ -1,23 +1,36 @@
-import { jest } from '@jest/globals';
-import { listHandler } from '../../src/tools/list';
-import { DocumentSummary } from '../../src/types/docTypes';
-import { getTestProjectRoot, getTempTestProjectRoot, cleanupTestFiles } from '../utils/test-helpers';
-import fs from 'fs/promises';
-import path from 'path';
+import { BaseTest } from '../utils/base-test';
+import { TestDataBuilder } from '../fixtures/test-data';
+import { listHandler } from '../../src/tools/list.js';
+import * as fs from 'fs/promises';
+import * as path from 'path';
+
+// Concrete test class for list operations
+class ListTest extends BaseTest {
+  // Inherit all functionality from BaseTest
+}
 
 describe('List Operation', () => {
+  let testInstance: ListTest;
+  
   beforeEach(async () => {
-    await cleanupTestFiles();
+    testInstance = new ListTest();
+    await testInstance.setup();
   });
-
-  afterAll(async () => {
-    await cleanupTestFiles();
+  
+  afterEach(async () => {
+    await testInstance.teardown();
   });
-
+  
   test('should list documents in .soloflow directory', async () => {
-    const projectRoot = getTestProjectRoot();
+    const testData = testInstance.createTestDataBuilder()
+      .addRequirements('# 📋 Test Requirements\n\nTest content.')
+      .addTasks('# 📋 Test Tasks\n\nTask content.')
+      .addSystemArchitecture('# 🏗 Test System Architecture\n\nArchitecture content.')
+      .build();
+    
+    await testInstance.createTestEnvironment(testData);
 
-    const result = await listHandler({ projectRoot });
+    const result = await listHandler({ projectRoot: testInstance.getProjectRoot() });
 
     expect(result).toHaveLength(3);
     
@@ -33,20 +46,23 @@ describe('List Operation', () => {
   });
 
   test('should return empty array for empty directory', async () => {
-    const projectRoot = getTempTestProjectRoot();
-    
-    // Create the directory but leave it empty
-    await fs.mkdir(path.join(projectRoot, '.soloflow'), { recursive: true });
+    await testInstance.createTestEnvironment();
 
-    const result = await listHandler({ projectRoot });
+    const result = await listHandler({ projectRoot: testInstance.getProjectRoot() });
 
     expect(result).toHaveLength(0);
   });
 
   test('should extract document titles from markdown content', async () => {
-    const projectRoot = getTestProjectRoot();
+    const testData = testInstance.createTestDataBuilder()
+      .addRequirements('# 📋 Test Requirements\n\nTest content.')
+      .addTasks('# 📋 Test Tasks\n\nTask content.')
+      .addSystemArchitecture('# 🏗 Test System Architecture\n\nArchitecture content.')
+      .build();
+    
+    await testInstance.createTestEnvironment(testData);
 
-    const result = await listHandler({ projectRoot });
+    const result = await listHandler({ projectRoot: testInstance.getProjectRoot() });
 
     const requirementsDoc = result.find(doc => doc.type === 'requirements');
     expect(requirementsDoc?.title).toBe('📋 Test Requirements');
@@ -59,43 +75,41 @@ describe('List Operation', () => {
   });
 
   test('should handle files without markdown title', async () => {
-    const projectRoot = getTempTestProjectRoot();
-    const soloflowPath = path.join(projectRoot, '.soloflow');
+    const testData = testInstance.createTestDataBuilder()
+      .addNotes('Just some notes without a title.')
+      .build();
     
-    // Create directory
-    await fs.mkdir(soloflowPath, { recursive: true });
-    
-    // Create a file without a title
-    await fs.writeFile(path.join(soloflowPath, 'notes.md'), 'Just some notes without a title.');
+    await testInstance.createTestEnvironment(testData);
 
-    const result = await listHandler({ projectRoot });
+    const result = await listHandler({ projectRoot: testInstance.getProjectRoot() });
 
     expect(result).toHaveLength(1);
     expect(result[0].title).toBeUndefined();
   });
 
   test('should skip non-markdown files', async () => {
-    const projectRoot = getTempTestProjectRoot();
-    const soloflowPath = path.join(projectRoot, '.soloflow');
+    const testData = testInstance.createTestDataBuilder()
+      .addRequirements('# Document Title')
+      .addTasks('# Tasks')
+      .build();
     
-    // Create directory
-    await fs.mkdir(soloflowPath, { recursive: true });
-    
-    // Create mixed files
-    await fs.writeFile(path.join(soloflowPath, 'requirements.md'), '# Document Title');
+    await testInstance.createTestEnvironment(testData);
+
+    // Create additional non-markdown files
+    const soloflowPath = path.join(testInstance.getProjectRoot(), '.soloflow');
     await fs.writeFile(path.join(soloflowPath, 'config.json'), '{"test": true}');
-    await fs.writeFile(path.join(soloflowPath, 'tasks.md'), '# Tasks');
     await fs.writeFile(path.join(soloflowPath, '.gitignore'), 'node_modules/');
 
-    const result = await listHandler({ projectRoot });
+    const result = await listHandler({ projectRoot: testInstance.getProjectRoot() });
 
     expect(result).toHaveLength(2);
-    expect(result.map(doc => doc.name)).toEqual(['requirements.md', 'tasks.md']);
+    expect(result.map(doc => doc.type)).toContain('requirements');
+    expect(result.map(doc => doc.type)).toContain('tasks');
   });
 
   test('should handle directory access errors', async () => {
-    const projectRoot = '/non/existent/path';
+    const nonExistentPath = '/non/existent/path';
 
-    await expect(listHandler({ projectRoot })).rejects.toThrow();
+    await expect(listHandler({ projectRoot: nonExistentPath })).rejects.toThrow();
   });
 }); 

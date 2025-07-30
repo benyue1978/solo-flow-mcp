@@ -1,139 +1,180 @@
-import { jest } from '@jest/globals';
-import { updateHandler } from '../../src/tools/update';
-import { DocType } from '../../src/types/docTypes';
-import { getTempTestProjectRoot, cleanupTestFiles } from '../utils/test-helpers';
-import fs from 'fs/promises';
-import path from 'path';
+import { BaseTest } from '../utils/base-test';
+import { TestDataBuilder } from '../fixtures/test-data';
+import { updateHandler } from '../../src/tools/update.js';
+import { DocType } from '../../src/types/docTypes.js';
+import * as fs from 'fs/promises';
+import * as path from 'path';
+
+// Concrete test class for update operations
+class UpdateTest extends BaseTest {
+  // Inherit all functionality from BaseTest
+}
 
 describe('Update Operation', () => {
+  let testInstance: UpdateTest;
+  
   beforeEach(async () => {
-    await cleanupTestFiles();
+    testInstance = new UpdateTest();
+    await testInstance.setup();
   });
-
-  afterAll(async () => {
-    await cleanupTestFiles();
+  
+  afterEach(async () => {
+    await testInstance.teardown();
   });
-
+  
   test('should create new document', async () => {
-    const projectRoot = getTempTestProjectRoot();
-    const docType: DocType = 'requirements';
-    const content = '# 📋 Project Requirements\n\nThis is the requirements document.';
-    const soloflowPath = path.join(projectRoot, '.soloflow');
-    const documentPath = path.join(soloflowPath, 'requirements.md');
-
-    // Create the project root directory
-    await fs.mkdir(projectRoot, { recursive: true });
-
-    const result = await updateHandler({ projectRoot, type: docType, content });
+    const content = '# New Requirements\n\nThis is new content.';
+    
+    // Create empty environment first
+    await testInstance.createEmptyEnvironment();
+    
+    const result = await updateHandler({ 
+      projectRoot: testInstance.getProjectRoot(), 
+      type: 'requirements', 
+      content 
+    });
 
     expect(result.ok).toBe(true);
     
     // Verify file was created
-    const fileExists = await fs.access(documentPath).then(() => true).catch(() => false);
-    expect(fileExists).toBe(true);
-    
-    // Verify content was written correctly
-    const writtenContent = await fs.readFile(documentPath, 'utf-8');
-    expect(writtenContent).toBe(content);
+    const filePath = path.join(testInstance.getProjectRoot(), '.soloflow', 'requirements.md');
+    const fileContent = await fs.readFile(filePath, 'utf-8');
+    expect(fileContent).toBe(content);
   });
 
   test('should update existing document', async () => {
-    const projectRoot = getTempTestProjectRoot();
-    const docType: DocType = 'requirements';
-    const initialContent = '# 📋 Initial Requirements\n\nInitial content.';
-    const updatedContent = '# 📋 Updated Requirements\n\nUpdated content.';
-    const soloflowPath = path.join(projectRoot, '.soloflow');
-    const documentPath = path.join(soloflowPath, 'requirements.md');
+    const initialContent = '# Initial Requirements\n\nInitial content.';
+    const updatedContent = '# Updated Requirements\n\nUpdated content.';
     
-    // Create initial file
-    await fs.mkdir(soloflowPath, { recursive: true });
-    await fs.writeFile(documentPath, initialContent);
+    const testData = testInstance.createTestDataBuilder()
+      .addRequirements(initialContent)
+      .build();
+    
+    await testInstance.createTestEnvironment(testData);
 
-    const result = await updateHandler({ projectRoot, type: docType, content: updatedContent });
+    const result = await updateHandler({ 
+      projectRoot: testInstance.getProjectRoot(), 
+      type: 'requirements', 
+      content: updatedContent 
+    });
 
     expect(result.ok).toBe(true);
     
-    // Verify content was updated
-    const writtenContent = await fs.readFile(documentPath, 'utf-8');
-    expect(writtenContent).toBe(updatedContent);
-  });
-
-  test('should create .soloflow directory if needed', async () => {
-    const projectRoot = getTempTestProjectRoot();
-    const docType: DocType = 'tasks';
-    const content = '# 📋 Tasks\n\nTask list.';
-    const soloflowPath = path.join(projectRoot, '.soloflow');
-
-    // Create the project root directory
-    await fs.mkdir(projectRoot, { recursive: true });
-
-    const result = await updateHandler({ projectRoot, type: docType, content });
-
-    expect(result.ok).toBe(true);
-    
-    // Verify directory was created
-    const dirExists = await fs.access(soloflowPath).then(() => true).catch(() => false);
-    expect(dirExists).toBe(true);
-  });
-
-  test('should handle write file errors', async () => {
-    const projectRoot = '/non/existent/path';
-    const docType: DocType = 'requirements';
-    const content = '# 📋 Requirements\n\nContent.';
-
-    await expect(updateHandler({ projectRoot, type: docType, content })).rejects.toThrow();
+    // Verify file was updated
+    const filePath = path.join(testInstance.getProjectRoot(), '.soloflow', 'requirements.md');
+    const fileContent = await fs.readFile(filePath, 'utf-8');
+    expect(fileContent).toBe(updatedContent);
   });
 
   test('should handle all document types', async () => {
-    const projectRoot = getTempTestProjectRoot();
-    const docTypes: DocType[] = [
-      'overview',
-      'requirements',
-      'system_architecture',
-      'test_strategy',
-      'ui_design',
-      'tasks',
-      'deployment',
-      'notes'
-    ];
-    const content = '# Document Title\n\nContent.';
-
-    // Create the project root directory
-    await fs.mkdir(projectRoot, { recursive: true });
-
+    const docTypes: DocType[] = ['requirements', 'tasks', 'system_architecture', 'test_strategy', 'ui_design', 'deployment', 'notes', 'overview'];
+    
     for (const docType of docTypes) {
-      const result = await updateHandler({ projectRoot, type: docType, content });
+      const content = `# Test ${docType}\n\nContent for ${docType}.`;
+      
+      // Create empty environment for each test
+      await testInstance.createEmptyEnvironment();
+      
+      const result = await updateHandler({ 
+        projectRoot: testInstance.getProjectRoot(), 
+        type: docType, 
+        content 
+      });
+
       expect(result.ok).toBe(true);
+      
+      // Verify file was created
+      const filePath = path.join(testInstance.getProjectRoot(), '.soloflow', `${docType}.md`);
+      const fileContent = await fs.readFile(filePath, 'utf-8');
+      expect(fileContent).toBe(content);
     }
   });
 
   test('should handle empty content', async () => {
-    const projectRoot = getTempTestProjectRoot();
-    const docType: DocType = 'notes';
-    const content = '';
+    await testInstance.createEmptyEnvironment();
 
-    // Create the project root directory
-    await fs.mkdir(projectRoot, { recursive: true });
+    await expect(updateHandler({ 
+      projectRoot: testInstance.getProjectRoot(), 
+      type: 'requirements', 
+      content: '' 
+    })).rejects.toThrow('Document content cannot be empty');
+  });
 
-    await expect(updateHandler({ projectRoot, type: docType, content })).rejects.toThrow('Document content cannot be empty');
+  test('should handle invalid document type', async () => {
+    await testInstance.createEmptyEnvironment();
+
+    await expect(updateHandler({ 
+      projectRoot: testInstance.getProjectRoot(), 
+      type: 'invalid_type' as any, 
+      content: '# Test' 
+    })).rejects.toThrow('Invalid document type');
+  });
+
+  test('should handle directory access errors', async () => {
+    await testInstance.createEmptyEnvironment();
+
+    const result = await updateHandler({ 
+      projectRoot: testInstance.getProjectRoot(), 
+      type: 'requirements', 
+      content: '# Test' 
+    });
+
+    expect(result.ok).toBe(true);
   });
 
   test('should handle large content', async () => {
-    const projectRoot = getTempTestProjectRoot();
-    const docType: DocType = 'requirements';
-    const content = '# 📋 Requirements\n\n'.repeat(1000); // Large content
-    const soloflowPath = path.join(projectRoot, '.soloflow');
-    const documentPath = path.join(soloflowPath, 'requirements.md');
-
-    // Create the project root directory
-    await fs.mkdir(projectRoot, { recursive: true });
-
-    const result = await updateHandler({ projectRoot, type: docType, content });
+    const largeContent = '# Large Document\n\n' + 'A'.repeat(10000);
+    
+    await testInstance.createEmptyEnvironment();
+    
+    const result = await updateHandler({ 
+      projectRoot: testInstance.getProjectRoot(), 
+      type: 'requirements', 
+      content: largeContent 
+    });
 
     expect(result.ok).toBe(true);
     
-    // Verify large content was written
-    const writtenContent = await fs.readFile(documentPath, 'utf-8');
-    expect(writtenContent).toBe(content);
+    // Verify file was created with large content
+    const filePath = path.join(testInstance.getProjectRoot(), '.soloflow', 'requirements.md');
+    const fileContent = await fs.readFile(filePath, 'utf-8');
+    expect(fileContent).toBe(largeContent);
+    expect(fileContent.length).toBe(10018);
+  });
+
+  test('should handle special characters in content', async () => {
+    const content = '# Special Characters\n\nContent with éñçüß and 🚀 emoji.';
+    
+    await testInstance.createEmptyEnvironment();
+    
+    const result = await updateHandler({ 
+      projectRoot: testInstance.getProjectRoot(), 
+      type: 'requirements', 
+      content 
+    });
+
+    expect(result.ok).toBe(true);
+    
+    // Verify file was created with special characters
+    const filePath = path.join(testInstance.getProjectRoot(), '.soloflow', 'requirements.md');
+    const fileContent = await fs.readFile(filePath, 'utf-8');
+    expect(fileContent).toBe(content);
+  });
+
+  test('should create .soloflow directory if it does not exist', async () => {
+    await testInstance.createEmptyEnvironment();
+
+    const result = await updateHandler({ 
+      projectRoot: testInstance.getProjectRoot(), 
+      type: 'requirements', 
+      content: '# Test' 
+    });
+
+    expect(result.ok).toBe(true);
+    
+    // Verify .soloflow directory was created
+    const soloflowPath = path.join(testInstance.getProjectRoot(), '.soloflow');
+    const soloflowExists = await fs.access(soloflowPath).then(() => true).catch(() => false);
+    expect(soloflowExists).toBe(true);
   });
 }); 

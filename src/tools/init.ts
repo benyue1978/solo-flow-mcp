@@ -1,5 +1,6 @@
 import { join } from 'path';
 import { validateProjectRoot, ensureSoloflowDirectory } from '../context.js';
+import { SOLOFLOW_MDC_CONTENT } from '../resources/soloflow-content.js';
 
 /**
  * Initialize project configuration
@@ -38,27 +39,22 @@ export async function initHandler(args: { projectRoot: string }): Promise<{
     // Create soloflow.mdc file
     const soloflowMdcPath = join(cursorRulesDir, 'soloflow.mdc');
     
-    // Read the soloflow.mdc content from resources
-    // Use path relative to the project root
-    const resourcePath = join(process.cwd(), 'src', 'resources', 'soloflow.mdc');
-    const soloflowMdcContent = await fs.readFile(resourcePath, 'utf-8');
-    
     try {
       await fs.access(soloflowMdcPath);
       skippedFiles.push('.cursor/rules/soloflow.mdc');
     } catch {
-      await fs.writeFile(soloflowMdcPath, soloflowMdcContent, 'utf-8');
+      await fs.writeFile(soloflowMdcPath, SOLOFLOW_MDC_CONTENT, 'utf-8');
       createdFiles.push('.cursor/rules/soloflow.mdc');
     }
     
     // Generate detailed message
     let message = '';
     if (createdFiles.length > 0) {
-      message += `✅ Created files: ${createdFiles.join(', ')}\n`;
+      message += `✅ Created files: ${createdFiles.join(', ')}\\n`;
     }
     if (skippedFiles.length > 0) {
-      message += `⚠️  Skipped existing files: ${skippedFiles.join(', ')}\n`;
-      message += `   These files already exist and were not overwritten.\n`;
+      message += `⚠️  Skipped existing files: ${skippedFiles.join(', ')}\\n`;
+      message += `   These files already exist and were not overwritten.\\n`;
     }
     
     if (createdFiles.length === 0 && skippedFiles.length === 0) {

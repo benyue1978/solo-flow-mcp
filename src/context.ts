@@ -41,7 +41,7 @@ export function validateProjectRoot(projectRoot: string): ValidationResult {
       };
     }
     
-    // Check if it's actually a directory
+    // Check if it's actually a directory (only if it exists)
     const stats = statSync(resolvedPath);
     if (!stats.isDirectory()) {
       return {

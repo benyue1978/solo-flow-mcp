@@ -1,90 +1,142 @@
-import { jest } from '@jest/globals';
-import { readHandler } from '../../src/tools/read';
-import { DocType } from '../../src/types/docTypes';
-import { getTestProjectRoot, getTempTestProjectRoot, cleanupTestFiles } from '../utils/test-helpers';
-import fs from 'fs/promises';
-import path from 'path';
+import { BaseTest } from '../utils/base-test';
+import { TestDataBuilder } from '../fixtures/test-data';
+import { readHandler } from '../../src/tools/read.js';
+import { DocType } from '../../src/types/docTypes.js';
+
+// Concrete test class for read operations
+class ReadTest extends BaseTest {
+  // Inherit all functionality from BaseTest
+}
 
 describe('Read Operation', () => {
+  let testInstance: ReadTest;
+  
   beforeEach(async () => {
-    await cleanupTestFiles();
+    testInstance = new ReadTest();
+    await testInstance.setup();
+  });
+  
+  afterEach(async () => {
+    await testInstance.teardown();
+  });
+  
+  test('should read document content', async () => {
+    const testData = testInstance.createTestDataBuilder()
+      .addRequirements('# Test Requirements\n\nThis is test content.')
+      .build();
+    
+    await testInstance.createTestEnvironment(testData);
+
+    const result = await readHandler({ 
+      projectRoot: testInstance.getProjectRoot(), 
+      type: 'requirements' 
+    });
+
+    expect(result.raw).toBe('# Test Requirements\n\nThis is test content.');
   });
 
-  afterAll(async () => {
-    await cleanupTestFiles();
-  });
+  test('should read all document types', async () => {
+    const testData = testInstance.createTestDataBuilder()
+      .addRequirements('# Test Requirements')
+      .addTasks('# Test Tasks')
+      .addSystemArchitecture('# System Architecture')
+      .addTestStrategy('# Test Strategy')
+      .addUIDesign('# UI Design')
+      .addDeployment('# Deployment')
+      .addNotes('# Notes')
+      .addOverview('# Overview')
+      .build();
+    
+    await testInstance.createTestEnvironment(testData);
 
-  test('should read existing document', async () => {
-    const projectRoot = getTestProjectRoot();
-    const docType: DocType = 'requirements';
-    const result = await readHandler({ projectRoot, type: docType });
-
-    expect(result.raw).toContain('# 📋 Test Requirements');
-    expect(result.raw).toContain('This is a test requirements document for unit testing');
-    expect(result.raw).toContain('Test document reading');
-    expect(result.raw).toContain('Performance: Fast execution');
+    const docTypes: DocType[] = ['requirements', 'tasks', 'system_architecture', 'test_strategy', 'ui_design', 'deployment', 'notes', 'overview'];
+    
+    for (const docType of docTypes) {
+      const result = await readHandler({ 
+        projectRoot: testInstance.getProjectRoot(), 
+        type: docType 
+      });
+      
+      if (docType === 'system_architecture') {
+        expect(result.raw).toBe('# System Architecture');
+      } else if (docType === 'test_strategy') {
+        expect(result.raw).toBe('# Test Strategy');
+      } else if (docType === 'ui_design') {
+        expect(result.raw).toBe('# UI Design');
+      } else if (docType === 'requirements') {
+        expect(result.raw).toBe('# Test Requirements');
+      } else if (docType === 'tasks') {
+        expect(result.raw).toBe('# Test Tasks');
+      } else if (docType === 'deployment') {
+        expect(result.raw).toBe('# Deployment');
+      } else if (docType === 'notes') {
+        expect(result.raw).toBe('# Notes');
+      } else if (docType === 'overview') {
+        expect(result.raw).toBe('# Overview');
+      }
+    }
   });
 
   test('should return null for non-existent document', async () => {
-    const projectRoot = getTestProjectRoot();
-    const docType: DocType = 'overview';
+    await testInstance.createTestEnvironment();
 
-    const result = await readHandler({ projectRoot, type: docType });
+    const result = await readHandler({ 
+      projectRoot: testInstance.getProjectRoot(), 
+      type: 'requirements' 
+    });
 
     expect(result.raw).toBeNull();
   });
 
-  test('should validate document type', async () => {
-    const projectRoot = getTestProjectRoot();
-    const invalidDocType = 'invalid_type' as DocType;
+  test('should handle invalid document type', async () => {
+    await testInstance.createTestEnvironment();
 
-    await expect(readHandler({ projectRoot, type: invalidDocType })).rejects.toThrow('Invalid document type');
+    await expect(readHandler({ 
+      projectRoot: testInstance.getProjectRoot(), 
+      type: 'invalid_type' as any 
+    })).rejects.toThrow('Invalid document type');
   });
 
-  test('should handle all document types', async () => {
-    const projectRoot = getTestProjectRoot();
-    const docTypes: DocType[] = [
-      'requirements',
-      'tasks',
-      'system_architecture'
-    ];
+  test('should handle directory access errors', async () => {
+    await testInstance.createEmptyEnvironment();
 
-    for (const docType of docTypes) {
-      const result = await readHandler({ projectRoot, type: docType });
-      expect(result.raw).toBeTruthy();
-      expect(typeof result.raw).toBe('string');
-    }
+    const result = await readHandler({ 
+      projectRoot: testInstance.getProjectRoot(), 
+      type: 'requirements' 
+    });
+
+    expect(result.raw).toBeNull();
   });
 
-  test('should handle permission errors', async () => {
-    const projectRoot = '/non/existent/path';
-    const docType: DocType = 'requirements';
-
-    await expect(readHandler({ projectRoot, type: docType })).rejects.toThrow();
-  });
-
-  test('should handle directory traversal attempts', async () => {
-    const projectRoot = getTestProjectRoot();
-    const docType: DocType = 'requirements';
-
-    const result = await readHandler({ projectRoot, type: docType });
-
-    // Should work normally as path validation is done at context level
-    expect(result.raw).toBeTruthy();
-  });
-
-  test('should read document from temporary project', async () => {
-    const projectRoot = getTempTestProjectRoot();
-    const soloflowPath = path.join(projectRoot, '.soloflow');
-    const docType: DocType = 'notes';
-    const testContent = '# Test Document\n\nThis is a test document.';
+  test('should read document with special characters', async () => {
+    const testData = testInstance.createTestDataBuilder()
+      .addRequirements('# Test Requirements\n\nContent with special chars: éñçüß')
+      .build();
     
-    // Create directory and file
-    await fs.mkdir(soloflowPath, { recursive: true });
-    await fs.writeFile(path.join(soloflowPath, 'notes.md'), testContent);
+    await testInstance.createTestEnvironment(testData);
 
-    const result = await readHandler({ projectRoot, type: docType });
+    const result = await readHandler({ 
+      projectRoot: testInstance.getProjectRoot(), 
+      type: 'requirements' 
+    });
 
-    expect(result.raw).toBe(testContent);
+    expect(result.raw).toBe('# Test Requirements\n\nContent with special chars: éñçüß');
+  });
+
+  test('should read large document content', async () => {
+    const largeContent = '# Large Document\n\n' + 'A'.repeat(10000);
+    const testData = testInstance.createTestDataBuilder()
+      .addRequirements(largeContent)
+      .build();
+    
+    await testInstance.createTestEnvironment(testData);
+
+    const result = await readHandler({ 
+      projectRoot: testInstance.getProjectRoot(), 
+      type: 'requirements' 
+    });
+
+    expect(result.raw).toBe(largeContent);
+    expect(result.raw?.length).toBe(10018); // 18 chars for title + 10000 for content
   });
 }); 
