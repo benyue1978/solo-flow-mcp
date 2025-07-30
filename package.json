@@ -1,6 +1,6 @@
 {
   "name": "@benyue1978/soloflow-mcp",
-  "version": "1.1.0",
+  "version": "1.0.4",
   "description": "MCP server for SoloFlow project documentation management",
   "main": "dist/index.js",
   "bin": {
