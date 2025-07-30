@@ -275,28 +275,28 @@ When you need to update project tasks:
 
 1. **First, read existing content:**
 
-\`\`\`json
-{
-  "tool": "read",
-  "args": {
-    "projectRoot": "/Users/username/project",
-    "type": "tasks"
-  }
-}
-\`\`\`
+    \`\`\`json
+    {
+      "tool": "read",
+      "args": {
+        "projectRoot": "/Users/username/project",
+        "type": "tasks"
+      }
+    }
+    \`\`\`
 
 2. **Then, update with new content:**
 
-\`\`\`json
-{
-  "tool": "update",
-  "args": {
-    "projectRoot": "/Users/username/project",
-    "type": "tasks",
-    "content": "# Project Tasks\\n\\n## To Do\\n- [ ] Implement user authentication\\n- [ ] Add data validation\\n\\n## Completed\\n- [x] Project initialization\\n- [x] Basic architecture setup"
-  }
-}
-\`\`\`
+    \`\`\`json
+    {
+      "tool": "update",
+      "args": {
+        "projectRoot": "/Users/username/project",
+        "type": "tasks",
+        "content": "# Project Tasks\\n\\n## To Do\\n- [ ] Implement user authentication\\n- [ ] Add data validation\\n\\n## Completed\\n- [x] Project initialization\\n- [x] Basic architecture setup"
+      }
+    }
+    \`\`\`
 
 ### **Scenario 5: Create System Architecture Document**
 
@@ -319,68 +319,68 @@ When you need structured guidance for software engineering practices:
 
 1. **Initialize project with prompts:**
 
-\`\`\`json
-{
-  "prompt": "init-project",
-  "args": {
-    "projectName": "My Web Application"
-  }
-}
-\`\`\`
+    \`\`\`json
+    {
+      "prompt": "init-project",
+      "args": {
+        "projectName": "My Web Application"
+      }
+    }
+    \`\`\`
 
 2. **Create document templates:**
 
-\`\`\`json
-{
-  "prompt": "create-doc-template",
-  "args": {
-    "docType": "requirements"
-  }
-}
-\`\`\`
+    \`\`\`json
+    {
+      "prompt": "create-doc-template",
+      "args": {
+        "docType": "requirements"
+      }
+    }
+    \`\`\`
 
 3. **Add tasks with prompts:**
 
-\`\`\`json
-{
-  "prompt": "add-task",
-  "args": {
-    "taskTitle": "Implement user authentication",
-    "priority": "high",
-    "category": "backend"
-  }
-}
-\`\`\`
+    \`\`\`json
+    {
+      "prompt": "add-task",
+      "args": {
+        "taskTitle": "Implement user authentication",
+        "priority": "high",
+        "category": "backend"
+      }
+    }
+    \`\`\`
 
 4. **Check project status:**
 
-\`\`\`json
-{
-  "prompt": "check-project-status"
-}
-\`\`\`
+    \`\`\`json
+    {
+      "prompt": "check-project-status"
+    }
+    \`\`\`
 
 5. **Get code review checklist:**
 
-\`\`\`json
-{
-  "prompt": "code-review-checklist",
-  "args": {
-    "codeLanguage": "TypeScript"
-  }
-}
-\`\`\`
+    \`\`\`json
+    {
+      "prompt": "code-review-checklist",
+      "args": {
+        "codeLanguage": "TypeScript"
+      }
+    }
+    \`\`\`
 
 6. **Get deployment checklist:**
 
-\`\`\`json
-{
-  "prompt": "deployment-checklist",
-  "args": {
-    "environment": "production"
-  }
-}
-\`\`\`
+    \`\`\`json
+    {
+      "prompt": "deployment-checklist",
+      "args": {
+        "environment": "production"
+      }
+    }
+    \`\`\`
 
 ## **Security Considerations**
 

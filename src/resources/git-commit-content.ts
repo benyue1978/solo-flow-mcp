@@ -1,4 +1,5 @@
----
+// Embedded git_commit.mdc content
+export const GIT_COMMIT_MDC_CONTENT = `---
 description: git commit rule
 globs: 
 alwaysApply: false
@@ -8,14 +9,14 @@ alwaysApply: false
 
 - Use the following **prefixes** for commit messages, followed by a **colon** and a **space**:
 
-  - `fix` — for bug fixes
-  - `feat` — for new features
-  - `perf` — for performance improvements
-  - `docs` — for documentation changes
-  - `style` — for formatting changes
-  - `refactor` — for code refactoring
-  - `test` — for adding missing tests
-  - `chore` — for routine tasks
+  - \`fix\` — for bug fixes
+  - \`feat\` — for new features
+  - \`perf\` — for performance improvements
+  - \`docs\` — for documentation changes
+  - \`style\` — for formatting changes
+  - \`refactor\` — for code refactoring
+  - \`test\` — for adding missing tests
+  - \`chore\` — for routine tasks
 
 - When determining the commit message prefix, pick the most **relevant** option from the list above.
 
@@ -28,3 +29,4 @@ alwaysApply: false
 - Commit but not push. You can only push after my approval.
 
 ---
+`; 

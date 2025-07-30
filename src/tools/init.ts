@@ -1,6 +1,7 @@
 import { join } from 'path';
 import { validateProjectRoot, ensureSoloflowDirectory } from '../context.js';
 import { SOLOFLOW_MDC_CONTENT } from '../resources/soloflow-content.js';
+import { GIT_COMMIT_MDC_CONTENT } from '../resources/git-commit-content.js';
 
 /**
  * Initialize project configuration
@@ -45,6 +46,17 @@ export async function initHandler(args: { projectRoot: string }): Promise<{
     } catch {
       await fs.writeFile(soloflowMdcPath, SOLOFLOW_MDC_CONTENT, 'utf-8');
       createdFiles.push('.cursor/rules/soloflow.mdc');
+    }
+    
+    // Create git_commit.mdc file
+    const gitCommitMdcPath = join(cursorRulesDir, 'git_commit.mdc');
+    
+    try {
+      await fs.access(gitCommitMdcPath);
+      skippedFiles.push('.cursor/rules/git_commit.mdc');
+    } catch {
+      await fs.writeFile(gitCommitMdcPath, GIT_COMMIT_MDC_CONTENT, 'utf-8');
+      createdFiles.push('.cursor/rules/git_commit.mdc');
     }
     
     // Generate detailed message

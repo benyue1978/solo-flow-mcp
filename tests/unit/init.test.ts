@@ -21,7 +21,7 @@ describe('Init Operation', () => {
     await testInstance.teardown();
   });
   
-  test('should create soloflow.mdc file', async () => {
+  test('should create soloflow.mdc and git_commit.mdc files', async () => {
     await testInstance.createEmptyEnvironment();
 
     const result = await initHandler({ projectRoot: testInstance.getProjectRoot() });
@@ -29,9 +29,13 @@ describe('Init Operation', () => {
     expect(result.ok).toBe(true);
     
     // Verify file was created
-    const filePath = path.join(testInstance.getProjectRoot(), '.cursor', 'rules', 'soloflow.mdc');
-    const fileContent = await fs.readFile(filePath, 'utf-8');
-    expect(fileContent).toContain('# SoloFlow MCP Service Guidelines');
+    const soloflowFilePath = path.join(testInstance.getProjectRoot(), '.cursor', 'rules', 'soloflow.mdc');
+    const soloflowFileContent = await fs.readFile(soloflowFilePath, 'utf-8');
+    expect(soloflowFileContent).toContain('# SoloFlow MCP Service Guidelines');
+
+    const gitCommitFilePath = path.join(testInstance.getProjectRoot(), '.cursor', 'rules', 'git_commit.mdc');
+    const gitCommitFileContent = await fs.readFile(gitCommitFilePath, 'utf-8');
+    expect(gitCommitFileContent).toContain('# Git Usage');
   });
 
   test('should handle existing file gracefully', async () => {
