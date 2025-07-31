@@ -30,7 +30,7 @@ Create `.cursor/mcp.json` in your project root:
 }
 ```
 
-[![Install MCP Server](https://cursor.com/deeplink/mcp-install-light.svg)](https://cursor.com/install-mcp?name=soloflow-mcp&config=JTdCJTIyY29tbWFuZCUyMiUzQSUyMm5weCUyMCU0MGJlbnl1ZTE5NzglMkZzb2xvZmxvdy1tY3AlMjIlN0Q%3D)
+[![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/install-mcp?name=soloflow-mcp&config=ewogICAgImNvbW1hbmQiOiAibnB4IiwKICAgICJhcmdzIjogWwogICAgICAiLXkiLAogICAgICAiQGJlbnl1ZTE5Nzgvc29sb2Zsb3ctbWNwQGxhdGVzdCIKICAgIF0KfQ)
 
 ### 2. Initialize Project
 
