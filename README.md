@@ -15,28 +15,9 @@ A Model Context Protocol (MCP) server for managing project documentation through
 
 ## Quick Start
 
-### Using npx (Recommended)
-
-```bash
-# Use directly without installation
-npx @benyue1978/soloflow-mcp
-```
-
-### Install to Project
-
-```bash
-# Global installation
-npm install -g @benyue1978/soloflow-mcp
-
-# Or local installation
-npm install @benyue1978/soloflow-mcp
-```
-
-## Using in Cursor
-
 ### 1. Configure Cursor
 
-Create `.cursor/settings.json` in your project root:
+Create `.cursor/mcp.json` in your project root:
 
 ```json
 {
@@ -48,6 +29,8 @@ Create `.cursor/settings.json` in your project root:
   }
 }
 ```
+
+[![Install MCP Server](https://cursor.com/deeplink/mcp-install-light.svg)](https://cursor.com/install-mcp?name=soloflow-mcp&config=JTdCJTIyY29tbWFuZCUyMiUzQSUyMm5weCUyMCU0MGJlbnl1ZTE5NzglMkZzb2xvZmxvdy1tY3AlMjIlN0Q%3D)
 
 ### 2. Initialize Project
 
