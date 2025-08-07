@@ -196,26 +196,11 @@ server.registerPrompt(
     title: "Setup Workspace",
     description: "Guide for setting up project workspace with technology stack",
     argsSchema: {
-      frontend: completable(z.string(), (value) => {
-        const frontends = ["React", "Vue", "Angular", "Svelte", "Next.js", "Nuxt"];
-        return frontends.filter(f => f.toLowerCase().startsWith(value.toLowerCase()));
-      }).optional().describe("Frontend framework"),
-      backend: completable(z.string(), (value) => {
-        const backends = ["Node.js", "Python", "Java", "C#", "Go", "Rust", "PHP"];
-        return backends.filter(b => b.toLowerCase().startsWith(value.toLowerCase()));
-      }).optional().describe("Backend technology"),
-      testing: completable(z.string(), (value) => {
-        const testings = ["Jest", "Cypress", "Playwright", "Selenium", "PyTest", "JUnit"];
-        return testings.filter(t => t.toLowerCase().startsWith(value.toLowerCase()));
-      }).optional().describe("Testing framework"),
-      deployment: completable(z.string(), (value) => {
-        const deployments = ["Docker", "Kubernetes", "AWS", "Azure", "GCP", "Vercel"];
-        return deployments.filter(d => d.toLowerCase().startsWith(value.toLowerCase()));
-      }).optional().describe("Deployment platform"),
-      database: completable(z.string(), (value) => {
-        const databases = ["PostgreSQL", "MongoDB", "MySQL", "Redis", "SQLite"];
-        return databases.filter(db => db.toLowerCase().startsWith(value.toLowerCase()));
-      }).optional().describe("Database technology")
+      frontend: z.string().optional().describe("Frontend framework (e.g., React, Vue, Angular, or 'NA' for none)"),
+      backend: z.string().optional().describe("Backend technology (e.g., Node.js, Python, Java, or 'NA' for none)"),
+      testing: z.string().optional().describe("Testing framework (e.g., Jest, Cypress, Playwright, or 'NA' for none)"),
+      deployment: z.string().optional().describe("Deployment platform (e.g., Docker, Kubernetes, AWS, or 'NA' for none)"),
+      database: z.string().optional().describe("Database technology (e.g., PostgreSQL, MongoDB, MySQL, or 'NA' for none)")
     }
   },
   ALL_PROMPTS['core-setup-workspace']
@@ -612,6 +597,97 @@ server.registerPrompt(
     }
   },
   ALL_PROMPTS['requirements-prioritize-requirements']
+);
+
+// Design prompts
+server.registerPrompt(
+  "design-create-ui",
+  {
+    title: "Create UI Design",
+    description: "Guide for designing user interfaces and components",
+    argsSchema: {
+      component: z.string().optional().describe("Component to design"),
+      page: z.string().optional().describe("Page to design"),
+      designType: completable(z.string(), (value) => {
+        const designTypes = ["user-interface", "mobile-app", "web-app", "dashboard", "form"];
+        return designTypes.filter(d => d.startsWith(value));
+      }).optional().describe("Type of design")
+    }
+  },
+  ALL_PROMPTS['design-create-ui']
+);
+
+server.registerPrompt(
+  "design-system-architecture",
+  {
+    title: "Design System Architecture",
+    description: "Guide for designing system architecture and components",
+    argsSchema: {
+      systemType: completable(z.string(), (value) => {
+        const systemTypes = ["web-application", "mobile-app", "microservices", "monolith", "serverless"];
+        return systemTypes.filter(s => s.startsWith(value));
+      }).optional().describe("Type of system"),
+      scale: completable(z.string(), (value) => {
+        const scales = ["small-scale", "medium-scale", "large-scale", "enterprise"];
+        return scales.filter(s => s.startsWith(value));
+      }).optional().describe("System scale")
+    }
+  },
+  ALL_PROMPTS['design-system-architecture']
+);
+
+server.registerPrompt(
+  "design-api-interface",
+  {
+    title: "Design API Interface",
+    description: "Guide for designing API interfaces and endpoints",
+    argsSchema: {
+      apiType: completable(z.string(), (value) => {
+        const apiTypes = ["REST", "GraphQL", "gRPC", "SOAP", "WebSocket"];
+        return apiTypes.filter(a => a.startsWith(value));
+      }).optional().describe("Type of API"),
+      version: z.string().optional().describe("API version")
+    }
+  },
+  ALL_PROMPTS['design-api-interface']
+);
+
+server.registerPrompt(
+  "design-database-schema",
+  {
+    title: "Design Database Schema",
+    description: "Guide for designing database schemas and data models",
+    argsSchema: {
+      databaseType: completable(z.string(), (value) => {
+        const dbTypes = ["Relational", "NoSQL", "Document", "Graph", "Time-Series"];
+        return dbTypes.filter(d => d.startsWith(value));
+      }).optional().describe("Type of database"),
+      schemaType: completable(z.string(), (value) => {
+        const schemaTypes = ["Normalized", "Denormalized", "Hybrid", "Star-Schema"];
+        return schemaTypes.filter(s => s.startsWith(value));
+      }).optional().describe("Type of schema")
+    }
+  },
+  ALL_PROMPTS['design-database-schema']
+);
+
+server.registerPrompt(
+  "design-review-design",
+  {
+    title: "Review Design",
+    description: "Guide for reviewing and validating all types of designs including UI, architecture, API, and database",
+    argsSchema: {
+      reviewType: completable(z.string(), (value) => {
+        const reviewTypes = ["comprehensive", "ui-design", "architecture", "api-design", "database", "security", "performance"];
+        return reviewTypes.filter(r => r.startsWith(value));
+      }).optional().describe("Type of review"),
+      designType: completable(z.string(), (value) => {
+        const designTypes = ["all-designs", "ui-design", "system-architecture", "api-design", "database-schema"];
+        return designTypes.filter(d => d.startsWith(value));
+      }).optional().describe("Type of design to review")
+    }
+  },
+  ALL_PROMPTS['design-review-design']
 );
 
 // Docs prompts

@@ -13,11 +13,11 @@ export async function workspaceSetupWorkspacePrompt(args: {
 }): Promise<{
   messages: Array<{ role: "user"; content: { type: "text"; text: string } }>;
 }> {
-  const frontend = args.frontend || 'React';
-  const backend = args.backend || 'Node.js';
-  const testing = args.testing || 'Jest';
-  const deployment = args.deployment || 'Docker';
-  const database = args.database || 'PostgreSQL';
+  const frontend = args.frontend || 'NA';
+  const backend = args.backend || 'NA';
+  const testing = args.testing || 'NA';
+  const deployment = args.deployment || 'NA';
+  const database = args.database || 'NA';
   
   let response = `⚙️ Workspace Setup Guide\n\n`;
   response += `🎨 Frontend: ${frontend}\n`;
@@ -74,89 +74,115 @@ export async function workspaceSetupWorkspacePrompt(args: {
   response += `\`\`\`\n\n`;
   
   response += `### 5. Technology Stack Configuration\n`;
-  response += `#### Frontend Setup (${frontend})\n`;
-  response += `\`\`\`bash\n`;
-  if (frontend === 'React') {
-    response += `# React setup\n`;
-    response += `npx create-react-app frontend --template typescript\n`;
-    response += `cd frontend && npm install @types/react @types/react-dom\n`;
-  } else if (frontend === 'Vue') {
-    response += `# Vue setup\n`;
-    response += `npm create vue@latest frontend\n`;
-    response += `cd frontend && npm install\n`;
-  } else if (frontend === 'Angular') {
-    response += `# Angular setup\n`;
-    response += `ng new frontend --routing --style=scss\n`;
-    response += `cd frontend && ng serve\n`;
-  }
-  response += `\`\`\`\n\n`;
   
-  response += `#### Backend Setup (${backend})\n`;
-  response += `\`\`\`bash\n`;
-  if (backend === 'Node.js') {
-    response += `# Node.js setup\n`;
-    response += `mkdir backend && cd backend\n`;
-    response += `npm init -y\n`;
-    response += `npm install express cors helmet morgan\n`;
-    response += `npm install -D nodemon @types/node @types/express\n`;
-  } else if (backend === 'Python') {
-    response += `# Python setup\n`;
-    response += `mkdir backend && cd backend\n`;
-    response += `python -m venv venv\n`;
-    response += `source venv/bin/activate  # On Windows: venv\\Scripts\\activate\n`;
-    response += `pip install fastapi uvicorn sqlalchemy\n`;
-  } else if (backend === 'Java') {
-    response += `# Java setup\n`;
-    response += `mkdir backend && cd backend\n`;
-    response += `# Use Spring Boot Initializr or Maven/Gradle\n`;
+  if (frontend !== 'NA') {
+    response += `#### Frontend Setup (${frontend})\n`;
+    response += `\`\`\`bash\n`;
+    if (frontend === 'React') {
+      response += `# React setup\n`;
+      response += `npx create-react-app frontend --template typescript\n`;
+      response += `cd frontend && npm install @types/react @types/react-dom\n`;
+    } else if (frontend === 'Vue') {
+      response += `# Vue setup\n`;
+      response += `npm create vue@latest frontend\n`;
+      response += `cd frontend && npm install\n`;
+    } else if (frontend === 'Angular') {
+      response += `# Angular setup\n`;
+      response += `ng new frontend --routing --style=scss\n`;
+      response += `cd frontend && ng serve\n`;
+    } else {
+      response += `# Custom frontend setup for ${frontend}\n`;
+      response += `# Configure ${frontend} according to project needs\n`;
+    }
+    response += `\`\`\`\n\n`;
   }
-  response += `\`\`\`\n\n`;
   
-  response += `#### Testing Setup (${testing})\n`;
-  response += `\`\`\`bash\n`;
-  if (testing === 'Jest') {
-    response += `# Jest setup\n`;
-    response += `npm install -D jest @types/jest\n`;
-    response += `npm install -D @testing-library/react @testing-library/jest-dom\n`;
-  } else if (testing === 'Cypress') {
-    response += `# Cypress setup\n`;
-    response += `npm install -D cypress\n`;
-    response += `npx cypress open\n`;
-  } else if (testing === 'Playwright') {
-    response += `# Playwright setup\n`;
-    response += `npm init playwright@latest\n`;
+  if (backend !== 'NA') {
+    response += `#### Backend Setup (${backend})\n`;
+    response += `\`\`\`bash\n`;
+    if (backend === 'Node.js') {
+      response += `# Node.js setup\n`;
+      response += `mkdir backend && cd backend\n`;
+      response += `npm init -y\n`;
+      response += `npm install express cors helmet morgan\n`;
+      response += `npm install -D nodemon @types/node @types/express\n`;
+    } else if (backend === 'Python') {
+      response += `# Python setup\n`;
+      response += `mkdir backend && cd backend\n`;
+      response += `python -m venv venv\n`;
+      response += `source venv/bin/activate  # On Windows: venv\\Scripts\\activate\n`;
+      response += `pip install fastapi uvicorn sqlalchemy\n`;
+    } else if (backend === 'Java') {
+      response += `# Java setup\n`;
+      response += `mkdir backend && cd backend\n`;
+      response += `# Use Spring Boot Initializr or Maven/Gradle\n`;
+    } else {
+      response += `# Custom backend setup for ${backend}\n`;
+      response += `# Configure ${backend} according to project needs\n`;
+    }
+    response += `\`\`\`\n\n`;
   }
-  response += `\`\`\`\n\n`;
   
-  response += `#### Database Setup (${database})\n`;
-  response += `\`\`\`bash\n`;
-  if (database === 'PostgreSQL') {
-    response += `# PostgreSQL setup\n`;
-    response += `# Install PostgreSQL locally or use Docker\n`;
-    response += `docker run --name postgres -e POSTGRES_PASSWORD=password -d postgres\n`;
-  } else if (database === 'MongoDB') {
-    response += `# MongoDB setup\n`;
-    response += `docker run --name mongodb -d mongo:latest\n`;
-  } else if (database === 'MySQL') {
-    response += `# MySQL setup\n`;
-    response += `docker run --name mysql -e MYSQL_ROOT_PASSWORD=password -d mysql:8\n`;
+  if (testing !== 'NA') {
+    response += `#### Testing Setup (${testing})\n`;
+    response += `\`\`\`bash\n`;
+    if (testing === 'Jest') {
+      response += `# Jest setup\n`;
+      response += `npm install -D jest @types/jest\n`;
+      response += `npm install -D @testing-library/react @testing-library/jest-dom\n`;
+    } else if (testing === 'Cypress') {
+      response += `# Cypress setup\n`;
+      response += `npm install -D cypress\n`;
+      response += `npx cypress open\n`;
+    } else if (testing === 'Playwright') {
+      response += `# Playwright setup\n`;
+      response += `npm init playwright@latest\n`;
+    } else {
+      response += `# Custom testing setup for ${testing}\n`;
+      response += `# Configure ${testing} according to project needs\n`;
+    }
+    response += `\`\`\`\n\n`;
   }
-  response += `\`\`\`\n\n`;
   
-  response += `#### Deployment Setup (${deployment})\n`;
-  response += `\`\`\`bash\n`;
-  if (deployment === 'Docker') {
-    response += `# Docker setup\n`;
-    response += `# Create Dockerfile for each service\n`;
-    response += `# Create docker-compose.yml for local development\n`;
-  } else if (deployment === 'Kubernetes') {
-    response += `# Kubernetes setup\n`;
-    response += `# Create deployment.yaml, service.yaml, ingress.yaml\n`;
-  } else if (deployment === 'AWS') {
-    response += `# AWS setup\n`;
-    response += `# Configure AWS CLI and create infrastructure\n`;
+  if (database !== 'NA') {
+    response += `#### Database Setup (${database})\n`;
+    response += `\`\`\`bash\n`;
+    if (database === 'PostgreSQL') {
+      response += `# PostgreSQL setup\n`;
+      response += `# Install PostgreSQL locally or use Docker\n`;
+      response += `docker run --name postgres -e POSTGRES_PASSWORD=password -d postgres\n`;
+    } else if (database === 'MongoDB') {
+      response += `# MongoDB setup\n`;
+      response += `docker run --name mongodb -d mongo:latest\n`;
+    } else if (database === 'MySQL') {
+      response += `# MySQL setup\n`;
+      response += `docker run --name mysql -e MYSQL_ROOT_PASSWORD=password -d mysql:8\n`;
+    } else {
+      response += `# Custom database setup for ${database}\n`;
+      response += `# Configure ${database} according to project needs\n`;
+    }
+    response += `\`\`\`\n\n`;
   }
-  response += `\`\`\`\n\n`;
+  
+  if (deployment !== 'NA') {
+    response += `#### Deployment Setup (${deployment})\n`;
+    response += `\`\`\`bash\n`;
+    if (deployment === 'Docker') {
+      response += `# Docker setup\n`;
+      response += `# Create Dockerfile for each service\n`;
+      response += `# Create docker-compose.yml for local development\n`;
+    } else if (deployment === 'Kubernetes') {
+      response += `# Kubernetes setup\n`;
+      response += `# Create deployment.yaml, service.yaml, ingress.yaml\n`;
+    } else if (deployment === 'AWS') {
+      response += `# AWS setup\n`;
+      response += `# Configure AWS CLI and create infrastructure\n`;
+    } else {
+      response += `# Custom deployment setup for ${deployment}\n`;
+      response += `# Configure ${deployment} according to project needs\n`;
+    }
+    response += `\`\`\`\n\n`;
+  }
   
   response += `### 6. Configuration Files\n`;
   response += `#### Package.json (Node.js)\n`;
@@ -182,29 +208,39 @@ export async function workspaceSetupWorkspacePrompt(args: {
   response += `}\n`;
   response += `\`\`\`\n\n`;
   
-  response += `#### Docker Compose\n`;
-  response += `\`\`\`yaml\n`;
-  response += `version: '3.8'\n`;
-  response += `services:\n`;
-  response += `  frontend:\n`;
-  response += `    build: ./frontend\n`;
-  response += `    ports:\n`;
-  response += `      - "3000:3000"\n`;
-  response += `    depends_on:\n`;
-  response += `      - backend\n`;
-  response += `  backend:\n`;
-  response += `    build: ./backend\n`;
-  response += `    ports:\n`;
-  response += `      - "8000:8000"\n`;
-  response += `    depends_on:\n`;
-  response += `      - database\n`;
-  response += `  database:\n`;
-  response += `    image: ${database.toLowerCase()}:latest\n`;
-  response += `    environment:\n`;
-  response += `      POSTGRES_PASSWORD: password\n`;
-  response += `    ports:\n`;
-  response += `      - "5432:5432"\n`;
-  response += `\`\`\`\n\n`;
+  if (deployment !== 'NA') {
+    response += `#### Docker Compose\n`;
+    response += `\`\`\`yaml\n`;
+    response += `version: '3.8'\n`;
+    response += `services:\n`;
+    if (frontend !== 'NA') {
+      response += `  frontend:\n`;
+      response += `    build: ./frontend\n`;
+      response += `    ports:\n`;
+      response += `      - "3000:3000"\n`;
+      response += `    depends_on:\n`;
+      response += `      - backend\n`;
+    }
+    if (backend !== 'NA') {
+      response += `  backend:\n`;
+      response += `    build: ./backend\n`;
+      response += `    ports:\n`;
+      response += `      - "8000:8000"\n`;
+      if (database !== 'NA') {
+        response += `    depends_on:\n`;
+        response += `      - database\n`;
+      }
+    }
+    if (database !== 'NA') {
+      response += `  database:\n`;
+      response += `    image: ${database.toLowerCase()}:latest\n`;
+      response += `    environment:\n`;
+      response += `      POSTGRES_PASSWORD: password\n`;
+      response += `    ports:\n`;
+      response += `      - "5432:5432"\n`;
+    }
+    response += `\`\`\`\n\n`;
+  }
   
   response += `### 7. Update System Architecture Document\n`;
   response += `\`\`\`json\n`;

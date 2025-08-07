@@ -30,6 +30,13 @@ export const PROMPT_MAPPING = {
   "requirements/validate-requirements": "requirements-validate-requirements",
   "requirements/prioritize-requirements": "requirements-prioritize-requirements",
   
+  // Design functions
+  "design/create-ui": "design-create-ui",
+  "design/system-architecture": "design-system-architecture",
+  "design/api-interface": "design-api-interface",
+  "design/database-schema": "design-database-schema",
+  "design/review-design": "design-review-design",
+  
   // Development functions
   "development/write-code": "development-write-code",
   "development/fix-bug": "development-fix-bug",

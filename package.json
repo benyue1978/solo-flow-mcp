@@ -1,7 +1,7 @@
 {
   "name": "@benyue1978/soloflow-mcp",
-  "version": "1.0.5",
-  "description": "MCP server for SoloFlow project documentation management",
+  "version": "1.0.6",
+  "description": "SoloFlow MCP server for project lifecycle and documentation management",
   "main": "dist/index.js",
   "bin": {
     "soloflow-mcp": "dist/index.js"
@@ -10,6 +10,7 @@
   "files": [
     "dist/**/*",
     "README.md",
+    "README.zh-CN.md",
     "LICENSE"
   ],
   "keywords": [

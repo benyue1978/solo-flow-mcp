@@ -1,13 +1,15 @@
 # SoloFlow MCP Server
 
-A Model Context Protocol (MCP) server for managing project documentation through the `.soloflow/` directory.
+A Model Context Protocol (MCP) server for managing project documentation through the `.soloflow/` directory with comprehensive software development lifecycle support.
+
+English | [中文](README.zh-CN.md)
 
 ## Features
 
 - 🚀 **MCP Protocol Support**: Complete Model Context Protocol implementation
 - 📁 **Document Management**: Automatically manage project documents in `.soloflow/` directory
 - 🔧 **Four Core Operations**: `list`, `read`, `update`, `init`
-- 🎯 **Six Core Prompts**: Built-in prompts for software engineering best practices
+- 🎯 **32 Comprehensive Prompts**: Built-in prompts covering the entire software development lifecycle
 - 🛡️ **Security Isolation**: Path isolation based on `projectRoot`
 - 📝 **Markdown Support**: Complete Markdown document format support
 - 🎯 **Cursor Integration**: Perfect support for Cursor IDE integration
@@ -46,17 +48,243 @@ In Cursor, AI assistants can now:
 - Read document content: `read` operation  
 - Update document content: `update` operation
 - Initialize project configuration: `init` operation
+- Use 32 comprehensive prompts for software development lifecycle
 
-### 4. Using Prompts in Cursor
+## Comprehensive Prompt System
 
-You can directly use prompts in Cursor's chat dialog by typing:
+SoloFlow MCP provides 32 prompts organized into 8 categories, covering the complete software development lifecycle:
 
-- `/soloflow-mcp/init-project` - Initialize project documentation structure
-- `/soloflow-mcp/create-doc-template` - Create standard document templates
-- `/soloflow-mcp/add-task` - Add new tasks to project
-- `/soloflow-mcp/check-project-status` - Check project status and documentation completeness
-- `/soloflow-mcp/code-review-checklist` - Get code review checklist
-- `/soloflow-mcp/deployment-checklist` - Get deployment preparation checklist
+### 📊 Prompt Categories Overview
+
+| Category | Count | Description |
+|----------|-------|-------------|
+| **Core** | 4 | Essential project management functions |
+| **Role** | 5 | Specialized functions for different development roles |
+| **Task** | 6 | Advanced task management and breakdown functions |
+| **Requirements** | 3 | Requirements analysis and management functions |
+| **Design** | 5 | Comprehensive design functions |
+| **Development** | 4 | Code implementation and development functions |
+| **Testing** | 5 | Testing and quality assurance functions |
+| **Release** | 5 | Complete release and deployment lifecycle management |
+
+## 🎯 Scenario-Based Usage Guide
+
+### Scenario 1: New Project Setup
+
+**Goal**: Initialize a new project with proper documentation and workspace setup
+
+**Prompt Sequence**:
+1. `/soloflow-mcp/core/init-project` - Initialize project documentation structure
+2. `/soloflow-mcp/core/setup-workspace` - Set up development environment with technology stack
+3. `/soloflow-mcp/requirements/analyze-requirements` - Analyze and document requirements
+4. `/soloflow-mcp/requirements/prioritize-requirements` - Prioritize requirements using MoSCoW method
+5. `/soloflow-mcp/task/breakdown-requirements` - Break down requirements into manageable tasks
+
+**Example Usage**:
+```bash
+# In Cursor chat, type:
+/soloflow-mcp/core/init-project
+/soloflow-mcp/core/setup-workspace --frontend React --backend Node.js --testing Jest --deployment Docker --database PostgreSQL
+/soloflow-mcp/requirements/analyze-requirements --domain e-commerce --scope full-system
+```
+
+### Scenario 2: Requirements Analysis Phase
+
+**Goal**: Comprehensive requirements gathering and analysis
+
+**Prompt Sequence**:
+1. `/soloflow-mcp/role/analyst-mode` - Switch to analyst mode for requirements focus
+2. `/soloflow-mcp/requirements/analyze-requirements` - Comprehensive requirements analysis
+3. `/soloflow-mcp/requirements/validate-requirements` - Validate requirements completeness
+4. `/soloflow-mcp/requirements/prioritize-requirements` - Prioritize using value-complexity matrix
+5. `/soloflow-mcp/task/create-epic` - Create high-level epics from requirements
+
+**Example Usage**:
+```bash
+# In Cursor chat, type:
+/soloflow-mcp/role/analyst-mode
+/soloflow-mcp/requirements/analyze-requirements --domain finance --scope full-system
+/soloflow-mcp/requirements/validate-requirements --validationType comprehensive
+```
+
+### Scenario 3: System Design Phase
+
+**Goal**: Design system architecture, UI, and data models
+
+**Prompt Sequence**:
+1. `/soloflow-mcp/role/architect-mode` - Switch to architect mode for design focus
+2. `/soloflow-mcp/design/system-architecture` - Design overall system architecture
+3. `/soloflow-mcp/design/api-interface` - Design API interfaces and contracts
+4. `/soloflow-mcp/design/database-schema` - Design database schema and data models
+5. `/soloflow-mcp/design/create-ui` - Design user interface and user experience
+6. `/soloflow-mcp/design/review-design` - Review and validate design decisions
+
+**Example Usage**:
+```bash
+# In Cursor chat, type:
+/soloflow-mcp/role/architect-mode
+/soloflow-mcp/design/system-architecture --architectureType microservices
+/soloflow-mcp/design/api-interface --apiType REST
+/soloflow-mcp/design/database-schema --dbType PostgreSQL
+```
+
+### Scenario 4: Development Phase
+
+**Goal**: Implement features with proper code quality and testing
+
+**Prompt Sequence**:
+1. `/soloflow-mcp/role/developer-mode` - Switch to developer mode for implementation focus
+2. `/soloflow-mcp/task/breakdown-architecture` - Break down architecture into implementation tasks
+3. `/soloflow-mcp/development/write-code` - Implement features with best practices
+4. `/soloflow-mcp/development/code-review-checklist` - Use code review checklist
+5. `/soloflow-mcp/testing/write-unit-tests` - Write comprehensive unit tests
+6. `/soloflow-mcp/development/fix-bug` - Debug and fix issues as they arise
+
+**Example Usage**:
+```bash
+# In Cursor chat, type:
+/soloflow-mcp/role/developer-mode
+/soloflow-mcp/development/write-code --feature user-authentication --language TypeScript --framework Express
+/soloflow-mcp/testing/write-unit-tests --component auth-service --language TypeScript --framework Jest
+/soloflow-mcp/development/code-review-checklist --codeLanguage TypeScript
+```
+
+### Scenario 5: Testing Phase
+
+**Goal**: Comprehensive testing strategy and execution
+
+**Prompt Sequence**:
+1. `/soloflow-mcp/role/tester-mode` - Switch to tester mode for quality focus
+2. `/soloflow-mcp/testing/create-test-plan` - Create comprehensive test plan
+3. `/soloflow-mcp/testing/write-unit-tests` - Write unit tests for all components
+4. `/soloflow-mcp/testing/run-tests` - Execute tests and analyze results
+5. `/soloflow-mcp/testing/test-report` - Generate detailed test reports
+6. `/soloflow-mcp/testing/performance-test` - Conduct performance testing
+
+**Example Usage**:
+```bash
+# In Cursor chat, type:
+/soloflow-mcp/role/tester-mode
+/soloflow-mcp/testing/create-test-plan --feature payment-system --testType comprehensive
+/soloflow-mcp/testing/run-tests --testType all --environment staging
+/soloflow-mcp/testing/performance-test --component api-gateway --loadType stress
+```
+
+### Scenario 6: Release Management
+
+**Goal**: Safe and reliable deployment with monitoring
+
+**Prompt Sequence**:
+1. `/soloflow-mcp/role/project-manager-mode` - Switch to project manager mode for coordination
+2. `/soloflow-mcp/release/commit-changes` - Commit changes with proper conventions
+3. `/soloflow-mcp/release/create-release` - Create software release with versioning
+4. `/soloflow-mcp/release/deployment-checklist` - Use deployment checklist
+5. `/soloflow-mcp/release/monitor-deployment` - Monitor deployment status
+6. `/soloflow-mcp/release/rollback-plan` - Prepare rollback plan if needed
+
+**Example Usage**:
+```bash
+# In Cursor chat, type:
+/soloflow-mcp/role/project-manager-mode
+/soloflow-mcp/release/commit-changes --commitType feat --scope user-authentication
+/soloflow-mcp/release/create-release --version 1.2.0 --releaseType minor
+/soloflow-mcp/release/deployment-checklist --environment production
+```
+
+### Scenario 7: Bug Fixing and Maintenance
+
+**Goal**: Efficient bug fixing and code maintenance
+
+**Prompt Sequence**:
+1. `/soloflow-mcp/development/fix-bug` - Analyze and fix bugs
+2. `/soloflow-mcp/development/refactor-code` - Refactor code for better maintainability
+3. `/soloflow-mcp/testing/run-tests` - Run tests to ensure fixes work
+4. `/soloflow-mcp/release/commit-changes` - Commit fixes with proper messages
+5. `/soloflow-mcp/core/generate-docs` - Update documentation for changes
+
+**Example Usage**:
+```bash
+# In Cursor chat, type:
+/soloflow-mcp/development/fix-bug --bugDescription "User login fails with 500 error" --severity high
+/soloflow-mcp/development/refactor-code --component auth-service --reason "Improve error handling"
+/soloflow-mcp/core/generate-docs --docType api --component authentication
+```
+
+### Scenario 8: Project Management and Coordination
+
+**Goal**: Effective project management and team coordination
+
+**Prompt Sequence**:
+1. `/soloflow-mcp/role/project-manager-mode` - Switch to project manager mode
+2. `/soloflow-mcp/task/add-task` - Add new tasks to project
+3. `/soloflow-mcp/task/estimate-tasks` - Estimate time and effort for tasks
+4. `/soloflow-mcp/task/create-story` - Create detailed user stories
+5. `/soloflow-mcp/core/check-project-status` - Check overall project status
+6. `/soloflow-mcp/task/create-epic` - Organize tasks into epics
+
+**Example Usage**:
+```bash
+# In Cursor chat, type:
+/soloflow-mcp/role/project-manager-mode
+/soloflow-mcp/task/add-task --taskTitle "Implement OAuth integration" --priority high --category backend --estimatedTime 3d
+/soloflow-mcp/task/estimate-tasks
+/soloflow-mcp/core/check-project-status
+```
+
+## 📋 Complete Prompt Reference
+
+### Core Functions (4 prompts)
+- `/soloflow-mcp/core/init-project` - Initialize project documentation structure
+- `/soloflow-mcp/core/check-project-status` - Check project status and documentation completeness
+- `/soloflow-mcp/core/generate-docs` - Generate comprehensive documentation for current implementation
+- `/soloflow-mcp/core/setup-workspace` - Set up project workspace with technology stack
+
+### Role-based Functions (5 prompts)
+- `/soloflow-mcp/role/analyst-mode` - Switch to analyst mode for requirements analysis
+- `/soloflow-mcp/role/architect-mode` - Switch to architect mode for system design
+- `/soloflow-mcp/role/developer-mode` - Switch to developer mode for implementation
+- `/soloflow-mcp/role/tester-mode` - Switch to tester mode for quality assurance
+- `/soloflow-mcp/role/project-manager-mode` - Switch to project manager mode for coordination
+
+### Task Management (6 prompts)
+- `/soloflow-mcp/task/add-task` - Add new tasks to project
+- `/soloflow-mcp/task/breakdown-requirements` - Break down requirements into tasks
+- `/soloflow-mcp/task/breakdown-architecture` - Break down architecture into implementation tasks
+- `/soloflow-mcp/task/create-epic` - Create large-scale feature epics
+- `/soloflow-mcp/task/create-story` - Create detailed user stories
+- `/soloflow-mcp/task/estimate-tasks` - Estimate time and effort for tasks
+
+### Requirements Analysis (3 prompts)
+- `/soloflow-mcp/requirements/analyze-requirements` - Comprehensive requirements analysis
+- `/soloflow-mcp/requirements/validate-requirements` - Validate requirements completeness
+- `/soloflow-mcp/requirements/prioritize-requirements` - Prioritize requirements using various methods
+
+### Design Functions (5 prompts)
+- `/soloflow-mcp/design/create-ui` - Design user interface and user experience
+- `/soloflow-mcp/design/system-architecture` - Design overall system architecture
+- `/soloflow-mcp/design/api-interface` - Design API interfaces and contracts
+- `/soloflow-mcp/design/database-schema` - Design database schema and data models
+- `/soloflow-mcp/design/review-design` - Review and validate design decisions
+
+### Development Functions (4 prompts)
+- `/soloflow-mcp/development/write-code` - Implement features with best practices
+- `/soloflow-mcp/development/fix-bug` - Debug and fix code issues
+- `/soloflow-mcp/development/refactor-code` - Refactor code for better maintainability
+- `/soloflow-mcp/development/code-review-checklist` - Use comprehensive code review checklist
+
+### Testing Functions (5 prompts)
+- `/soloflow-mcp/testing/create-test-plan` - Create comprehensive test plans
+- `/soloflow-mcp/testing/write-unit-tests` - Write unit tests for components
+- `/soloflow-mcp/testing/run-tests` - Execute tests and analyze results
+- `/soloflow-mcp/testing/test-report` - Generate detailed test reports
+- `/soloflow-mcp/testing/performance-test` - Conduct performance testing
+
+### Release Management (5 prompts)
+- `/soloflow-mcp/release/commit-changes` - Commit changes with proper conventions
+- `/soloflow-mcp/release/create-release` - Create software releases with versioning
+- `/soloflow-mcp/release/deployment-checklist` - Use deployment preparation checklist
+- `/soloflow-mcp/release/rollback-plan` - Prepare rollback plans
+- `/soloflow-mcp/release/monitor-deployment` - Monitor deployment status
 
 ## Supported Document Types
 
@@ -172,61 +400,6 @@ Initialize project configuration, create `.cursor/rules/soloflow.mdc` file:
 }
 ```
 
-### Built-in Prompts
-
-SoloFlow MCP includes 6 core prompts designed for software engineering best practices:
-
-#### init-project
-Initialize project documentation structure and create basic document templates.
-
-**Usage in Cursor**: Type `/soloflow-mcp/init-project` in the chat dialog
-
-**Parameters**:
-- `projectName` (optional): Project name for customization
-
-#### create-doc-template
-Create standard document templates for different document types.
-
-**Usage in Cursor**: Type `/soloflow-mcp/create-doc-template` in the chat dialog
-
-**Parameters**:
-- `docType` (optional): Document type (overview, requirements, etc.)
-- `projectName` (optional): Project name for template customization
-
-#### add-task
-Add new tasks to the project task list.
-
-**Usage in Cursor**: Type `/soloflow-mcp/add-task` in the chat dialog
-
-**Parameters**:
-- `taskTitle` (optional): Task title
-- `priority` (optional): Task priority (high, medium, low)
-- `category` (optional): Task category (backend, frontend, testing, etc.)
-- `estimatedTime` (optional): Estimated time to complete
-
-#### check-project-status
-Analyze project documentation completeness and task progress.
-
-**Usage in Cursor**: Type `/soloflow-mcp/check-project-status` in the chat dialog
-
-**Parameters**: None (automatically analyzes current project)
-
-#### code-review-checklist
-Get a standard code review checklist.
-
-**Usage in Cursor**: Type `/soloflow-mcp/code-review-checklist` in the chat dialog
-
-**Parameters**:
-- `codeLanguage` (optional): Programming language (TypeScript, Python, etc.)
-
-#### deployment-checklist
-Get a deployment preparation checklist.
-
-**Usage in Cursor**: Type `/soloflow-mcp/deployment-checklist` in the chat dialog
-
-**Parameters**:
-- `environment` (optional): Deployment environment (production, staging, development)
-
 ## Security Features
 
 ### Path Isolation
@@ -281,6 +454,20 @@ npm start
 │   │   ├── read.ts          # Read documents
 │   │   ├── update.ts        # Update documents
 │   │   └── init.ts          # Initialize project
+│   ├── prompts/              # Comprehensive prompt system
+│   │   ├── core-prompts.ts  # Core project management prompts
+│   │   ├── role-prompts.ts  # Role-based prompts
+│   │   ├── task-prompts.ts  # Task management prompts
+│   │   ├── requirements-prompts.ts # Requirements analysis prompts
+│   │   ├── design-prompts.ts # Design and architecture prompts
+│   │   ├── development-prompts.ts # Development and coding prompts
+│   │   ├── testing-prompts.ts # Testing and QA prompts
+│   │   ├── release-prompts.ts # Release and deployment prompts
+│   │   ├── docs-prompts.ts  # Documentation prompts
+│   │   ├── workspace-prompts.ts # Workspace setup prompts
+│   │   ├── categories.ts    # Prompt categories
+│   │   ├── mapping.ts       # Path mapping system
+│   │   └── index.ts         # Prompt registry
 │   ├── types/
 │   │   └── docTypes.ts      # Document type definitions
 │   └── resources/
@@ -347,17 +534,18 @@ npx @benyue1978/soloflow-mcp update \
    - Read document content
    - Update document content
    - Manage project configuration
+   - Use 32 comprehensive prompts for software development lifecycle
 
 ### Example 4: Using Prompts in Cursor
 
 1. Configure Cursor settings (as shown above)
-2. In Cursor's chat dialog, type any of these prompts:
-   - `/soloflow-mcp/init-project` - Initialize project documentation
-   - `/soloflow-mcp/create-doc-template` - Create document templates
-   - `/soloflow-mcp/add-task` - Add new tasks
-   - `/soloflow-mcp/check-project-status` - Check project status
-   - `/soloflow-mcp/code-review-checklist` - Get code review checklist
-   - `/soloflow-mcp/deployment-checklist` - Get deployment checklist
+2. In Cursor's chat dialog, type any of the 32 prompts:
+   - `/soloflow-mcp/core/init-project` - Initialize project documentation
+   - `/soloflow-mcp/requirements/analyze-requirements` - Analyze requirements
+   - `/soloflow-mcp/design/system-architecture` - Design system architecture
+   - `/soloflow-mcp/development/write-code` - Write code with best practices
+   - `/soloflow-mcp/testing/create-test-plan` - Create test plans
+   - `/soloflow-mcp/release/commit-changes` - Commit changes properly
 
 3. The AI will automatically execute the prompt and update your project documentation
 
@@ -376,6 +564,9 @@ A: Currently supports Markdown format, other formats may be supported in the fut
 
 **Q: How to handle concurrent writes?**
 A: Current version uses simple file system operations, it's recommended to avoid concurrent writes to the same document.
+
+**Q: How to use prompts effectively?**
+A: Use prompts in sequence following the software development lifecycle. Start with core functions, then move to specific phases like requirements, design, development, testing, and release.
 
 ### Error Codes
 
@@ -401,7 +592,24 @@ MIT License - see [LICENSE](LICENSE) file for details
 
 ## Changelog
 
+### v1.0.6
+- Add comprehensive bilingual documentation support with Chinese README
+- Add language selection links between English and Chinese README files
+- Add 32 comprehensive prompts covering entire software development lifecycle
+- Add scenario-based usage guide with 8 common development scenarios
+- Add role-based prompts for different development roles
+- Add requirements analysis, design, development, testing, and release management prompts
+- Add git_commit.mdc rule file for standardized Git commit messages
+- Create git-commit-content.ts with embedded git commit guidelines
+- Update init tool to automatically create git_commit.mdc during project initialization
+- Enhance project setup with Git commit message conventions
+- Follow consistent pattern for rule file creation and management
+
 ### v1.0.5
+- Add comprehensive prompt system with 32 prompts covering entire software development lifecycle
+- Add scenario-based usage guide with 8 common development scenarios
+- Add role-based prompts for different development roles
+- Add requirements analysis, design, development, testing, and release management prompts
 - Add git_commit.mdc rule file for standardized Git commit messages
 - Create git-commit-content.ts with embedded git commit guidelines
 - Update init tool to automatically create git_commit.mdc during project initialization

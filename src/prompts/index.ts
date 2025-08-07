@@ -39,6 +39,15 @@ import {
   requirementsPrioritizeRequirementsPrompt
 } from './requirements-prompts.js';
 
+// Import design prompts
+import {
+  designCreateUIPrompt,
+  designSystemArchitecturePrompt,
+  designAPIInterfacePrompt,
+  designDatabaseSchemaPrompt,
+  designReviewPrompt
+} from './design-prompts.js';
+
 // Import development prompts
 import {
   developmentWriteCodePrompt,
@@ -102,6 +111,13 @@ export const ALL_PROMPTS = {
   'requirements-analyze-requirements': requirementsAnalyzeRequirementsPrompt,
   'requirements-validate-requirements': requirementsValidateRequirementsPrompt,
   'requirements-prioritize-requirements': requirementsPrioritizeRequirementsPrompt,
+  
+  // Design prompts
+  'design-create-ui': designCreateUIPrompt,
+  'design-system-architecture': designSystemArchitecturePrompt,
+  'design-api-interface': designAPIInterfacePrompt,
+  'design-database-schema': designDatabaseSchemaPrompt,
+  'design-review-design': designReviewPrompt,
   
   // Development prompts
   'development-write-code': developmentWriteCodePrompt,

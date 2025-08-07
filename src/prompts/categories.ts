@@ -24,6 +24,11 @@ export const PROMPT_CATEGORIES = {
     description: 'Requirements analysis and management functions',
     prompts: ['analyze-requirements', 'validate-requirements', 'prioritize-requirements']
   },
+  design: {
+    name: 'Design Functions',
+    description: 'Comprehensive design functions including UI, system, architecture, data, and API design',
+    prompts: ['create-ui', 'system-architecture', 'api-interface', 'database-schema', 'review-design']
+  },
   development: {
     name: 'Development Functions',
     description: 'Code implementation and development functions',
