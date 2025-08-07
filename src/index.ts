@@ -690,55 +690,6 @@ server.registerPrompt(
   ALL_PROMPTS['design-review-design']
 );
 
-// Docs prompts
-server.registerPrompt(
-  "docs-generate-docs",
-  {
-    title: "Generate Documentation",
-    description: "Guide for generating comprehensive documentation for current implementation",
-    argsSchema: {
-      docType: completable(z.string(), (value) => {
-        const docTypes = ["api", "implementation", "user-manual", "developer-guide", "deployment"];
-        return docTypes.filter(d => d.startsWith(value));
-      }).optional().describe("Type of documentation"),
-      component: z.string().optional().describe("Component to document")
-    }
-  },
-  ALL_PROMPTS['core-generate-docs']
-);
-
-// Workspace prompts
-server.registerPrompt(
-  "workspace-setup-workspace",
-  {
-    title: "Setup Workspace",
-    description: "Guide for setting up project workspace with technology stack",
-    argsSchema: {
-      frontend: completable(z.string(), (value) => {
-        const frontends = ["React", "Vue", "Angular", "Svelte", "Next.js", "Nuxt"];
-        return frontends.filter(f => f.toLowerCase().startsWith(value.toLowerCase()));
-      }).optional().describe("Frontend framework"),
-      backend: completable(z.string(), (value) => {
-        const backends = ["Node.js", "Python", "Java", "C#", "Go", "Rust", "PHP"];
-        return backends.filter(b => b.toLowerCase().startsWith(value.toLowerCase()));
-      }).optional().describe("Backend technology"),
-      testing: completable(z.string(), (value) => {
-        const testings = ["Jest", "Cypress", "Playwright", "Selenium", "PyTest", "JUnit"];
-        return testings.filter(t => t.toLowerCase().startsWith(value.toLowerCase()));
-      }).optional().describe("Testing framework"),
-      deployment: completable(z.string(), (value) => {
-        const deployments = ["Docker", "Kubernetes", "AWS", "Azure", "GCP", "Vercel"];
-        return deployments.filter(d => d.toLowerCase().startsWith(value.toLowerCase()));
-      }).optional().describe("Deployment platform"),
-      database: completable(z.string(), (value) => {
-        const databases = ["PostgreSQL", "MongoDB", "MySQL", "Redis", "SQLite"];
-        return databases.filter(db => db.toLowerCase().startsWith(value.toLowerCase()));
-      }).optional().describe("Database technology")
-    }
-  },
-  ALL_PROMPTS['core-setup-workspace']
-);
-
 // Start server with stdio transport
 async function main() {
   const stdioTransport = new StdioServerTransport();

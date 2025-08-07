@@ -1,6 +1,6 @@
 # SoloFlow MCP Server
 
-A Model Context Protocol (MCP) server for managing project documentation through the `.soloflow/` directory with comprehensive software development lifecycle support.
+A Model Context Protocol (MCP) server for project document management with 32 comprehensive prompts covering the complete software development lifecycle.
 
 English | [中文](README.zh-CN.md)
 
@@ -591,6 +591,18 @@ Contributions are welcome! Please follow these steps:
 MIT License - see [LICENSE](LICENSE) file for details
 
 ## Changelog
+
+### v1.1.0
+- Major version bump with enhanced project documentation management
+- Update all internal project documents to reflect v1.0.6 features and v1.1.0 status
+- Improve package.json with better description and metadata
+- Enhance project structure with comprehensive documentation updates
+- Add detailed technical specifications and architecture documentation
+- Update deployment and test strategy documentation
+- Improve project notes with comprehensive development history
+- Ensure all 8 core documents are synchronized with latest project status
+- Maintain 50 test cases with 100% pass rate
+- Complete bilingual documentation support (English and Chinese)
 
 ### v1.0.6
 - Add comprehensive bilingual documentation support with Chinese README

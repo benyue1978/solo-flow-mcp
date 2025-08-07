@@ -1,14 +1,14 @@
 # 📋 任务计划文档（Tasks）
 
 **项目名称：** soloflow-mcp  
-**版本：** v0.8  
-**文档更新时间：** 2025-07-30
+**版本：** v1.0.6  
+**文档更新时间：** 2025-08-07
 
 ---
 
 ## 🎯 项目现状分析
 
-### ✅ 已完成功能（第一阶段到第五阶段完成）
+### ✅ 已完成功能（第一阶段到第六阶段完成）
 
 | 功能模块 | 完成状态 | 说明 |
 |----------|----------|------|
@@ -20,27 +20,42 @@
 | 资源文件管理 | ✅ 完成 | soloflow.mdc 作为资源文件 |
 | 用户反馈优化 | ✅ 完成 | init 工具提供详细的状态反馈 |
 | 测试框架搭建 | ✅ 完成 | Jest 配置，单元测试，集成测试 |
-| 测试隔离优化 | ✅ 完成 | 完全隔离的测试环境，47个测试通过 |
-| **Prompts 功能实现** | ✅ 完成 | 新增 6 个核心 prompts，支持软件工程最佳实践 |
+| 测试隔离优化 | ✅ 完成 | 完全隔离的测试环境，50个测试通过 |
+| **Prompts 功能实现** | ✅ 完成 | 新增 32 个综合 prompts，支持完整软件开发生命周期 |
 | **NPM 包发布** | ✅ 完成 | 支持 npx 安装和 Cursor 集成 |
 | **项目文档完善** | ✅ 完成 | 8个核心文档全部创建和更新 |
 | **README 文档更新** | ✅ 完成 | 添加 prompts 使用说明和 Cursor 集成指南 |
-| **版本发布 v1.0.2** | ✅ 完成 | 发布新版本到 NPM，更新 changelog |
+| **版本发布 v1.0.6** | ✅ 完成 | 发布新版本到 NPM，更新 changelog |
+| **双语文档支持** | ✅ 完成 | 添加中文README和语言选择功能 |
+| **场景化使用指南** | ✅ 完成 | 8个常见开发场景的完整指南 |
+| **基于角色的提示** | ✅ 完成 | 5个不同开发角色的专门功能 |
 
 ### 🔄 当前架构状态
 
 ```bash
 # 当前项目结构
 ├── src/
-│   ├── index.ts              # 服务启动入口（stdio 模式 + prompts 支持）
+│   ├── index.ts              # 服务启动入口（stdio 模式 + 32个prompts支持）
 │   ├── context.ts            # projectRoot 校验 + 路径工具
 │   ├── tools/                # MCP 指令处理器
 │   │   ├── list.ts          ✅ 实现
 │   │   ├── read.ts          ✅ 实现
 │   │   ├── update.ts        ✅ 实现
 │   │   └── init.ts          ✅ 实现
-│   ├── prompts/              # Prompts 功能实现
-│   │   └── index.ts         ✅ 6个核心 prompts 实现
+│   ├── prompts/              # 综合提示系统实现
+│   │   ├── core-prompts.ts  ✅ 核心项目管理提示
+│   │   ├── role-prompts.ts  ✅ 基于角色的提示
+│   │   ├── task-prompts.ts  ✅ 任务管理提示
+│   │   ├── requirements-prompts.ts ✅ 需求分析提示
+│   │   ├── design-prompts.ts ✅ 设计和架构提示
+│   │   ├── development-prompts.ts ✅ 开发和编码提示
+│   │   ├── testing-prompts.ts ✅ 测试和QA提示
+│   │   ├── release-prompts.ts ✅ 发布和部署提示
+│   │   ├── docs-prompts.ts  ✅ 文档提示
+│   │   ├── workspace-prompts.ts ✅ 工作区设置提示
+│   │   ├── categories.ts    ✅ 提示类别管理
+│   │   ├── mapping.ts       ✅ 路径映射系统
+│   │   └── index.ts         ✅ 提示注册表
 │   ├── types/
 │   │   └── docTypes.ts      ✅ DocType 枚举定义
 │   └── resources/
@@ -55,8 +70,9 @@
 │   ├── deployment.md        ✅ 部署配置
 │   └── notes.md             ✅ 项目笔记
 ├── .cursor/rules/           ✅ Cursor 规则（包含 prompts 声明）
-├── README.md                ✅ 更新 prompts 使用说明
-└── package.json             ✅ 版本 v1.0.2
+├── README.md                ✅ 英文README（包含32个prompts使用指南）
+├── README.zh-CN.md          ✅ 中文README（完整翻译）
+└── package.json             ✅ 版本 v1.0.6
 ```
 
 ---

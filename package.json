@@ -1,63 +1,57 @@
 {
   "name": "@benyue1978/soloflow-mcp",
-  "version": "1.0.6",
-  "description": "SoloFlow MCP server for project lifecycle and documentation management",
+  "version": "1.1.0",
+  "description": "A Model Context Protocol (MCP) server for project document management with 32 comprehensive prompts covering the complete software development lifecycle",
   "main": "dist/index.js",
+  "type": "module",
   "bin": {
     "soloflow-mcp": "dist/index.js"
   },
-  "type": "module",
   "files": [
-    "dist/**/*",
+    "dist/",
     "README.md",
-    "README.zh-CN.md",
-    "LICENSE"
+    "README.zh-CN.md"
   ],
+  "scripts": {
+    "build": "tsc && npm run copy-resources",
+    "copy-resources": "cp -r src/resources dist/",
+    "test": "jest",
+    "test:coverage": "jest --coverage",
+    "prepublishOnly": "npm run build && npm test"
+  },
   "keywords": [
     "mcp",
-    "cursor",
-    "documentation",
-    "project-management",
     "model-context-protocol",
-    "stdio"
+    "project-management",
+    "documentation",
+    "ai-assistant",
+    "cursor",
+    "ide-integration",
+    "software-development",
+    "prompts",
+    "typescript"
   ],
-  "author": "SongYue <yuesong@gmail.com>",
+  "author": "Song Yue <benyue1978@gmail.com>",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/benyue1978/solo-flow-mcp.git"
   },
-  "publishConfig": {
-    "access": "public"
+  "bugs": {
+    "url": "https://github.com/benyue1978/solo-flow-mcp/issues"
   },
-  "scripts": {
-    "build": "tsc && npm run copy-resources",
-    "copy-resources": "cp -r src/resources dist/",
-    "start": "node dist/index.js",
-    "dev": "tsc && node dist/index.js",
-    "test-stdio": "node test-stdio.js",
-    "test-inspector": "node test-inspector.js",
-    "test-absolute-paths": "node test-absolute-paths.js",
-    "test-readme": "node test-readme.js",
-    "inspector": "npx @modelcontextprotocol/inspector node dist/index.js",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage",
-    "test:unit": "jest tests/unit",
-    "test:integration": "jest tests/integration",
-    "test:security": "jest tests/security",
-    "prepublishOnly": "npm run build && npm test",
-    "postpublish": "echo 'Package published successfully!'"
-  },
+  "homepage": "https://github.com/benyue1978/solo-flow-mcp#readme",
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.16.0",
-    "zod": "^3.25.76"
+    "@modelcontextprotocol/sdk": "^0.4.0"
   },
   "devDependencies": {
-    "@types/jest": "^30.0.0",
-    "@types/node": "^20.10.0",
-    "jest": "^30.0.5",
-    "ts-jest": "^29.4.0",
-    "typescript": "^5.3.0"
+    "@types/jest": "^29.5.0",
+    "@types/node": "^20.0.0",
+    "jest": "^29.5.0",
+    "ts-jest": "^29.1.0",
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }
